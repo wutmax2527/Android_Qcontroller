@@ -93,7 +93,6 @@ public class MainActivity extends AppCompatActivity {
     //Uart Q-Print&QSound
     private Uart uart = null;//new Uart(19200);
     private PrinterService printerService = new PrinterService();
-    
     private SoundService soundService = new SoundService();
 
     // Used to load the 'native-lib' library on application startup.
