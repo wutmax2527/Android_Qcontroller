@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html debug="true">
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="viewport" content="target-densitydpi=device-dpi" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script type="text/javascript">
+           function PrintTicket(divId)
+           {
+        	   Android.PrintTicket(divId);
+           }
+           function SendPrinter(divId)
+           {
+        	   Android.SendPrinter(divId);
+           }
+		   function SendAB()
+		   {
+			   Android.SendAB();
+		   }
+
+		   function init2(data)
+           {
+        	  document.getElementById("txt").innerHTML = data;
+           }
+        </script>
+</script>
+</head>
+<body>
+<br><br><br>
+<div class="container">
+	<div class="row">
+	<div class="col-xs-8" style="text-align:center;">
+		<div style="width:50%;background-color:#87CEEB;" onclick="PrintTicket('1')">
+		<p><font size="6" id="txt1">SEND PRINTER</font></p>
+		</div><br>
+	</div>
+	<div class="col-xs-4" style="text-align:center;">
+	<div style="width:50%;background-color:#87CEEB;" onclick="PrintTicket('2')">
+		<p><font size="6" id="txt2">SEND AB</font></p>
+	</div><br>
+	</div>
+	<div class="col-xs-4" style="text-align:center;">
+	<img src="1.jpg">
+	</div>
+    <br><br><br>
+	<div class="col-xs-12" style="text-align:center;color:red;">
+	
+		<p><font size="6" id="txt">This is some text!</font></p>
+	</div>
+    </div>
+</div>
+
+
+
+</body>
+</html>
+

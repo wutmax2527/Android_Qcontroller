@@ -16,6 +16,7 @@ import th.co.infinitecorp.www.qcontroller.DataInfo.QInfo;
 import th.co.infinitecorp.www.qcontroller.DataInfo.QTicketInfo;
 import th.co.infinitecorp.www.qcontroller.EventBus.DebugMessageEvent;
 import th.co.infinitecorp.www.qcontroller.MainActivity;
+import th.co.infinitecorp.www.qcontroller.Management.LogMgr;
 import th.co.infinitecorp.www.qcontroller.Management.QueueMgr;
 import th.co.infinitecorp.www.qcontroller.Management.SystemMgr;
 import th.co.infinitecorp.www.qcontroller.Management.ViewLogMgr;
@@ -109,11 +110,13 @@ Remark: DATETIME[7]=YYYY-MM-DD-hh-mm-ss
         QInfo qInfo =new QInfo();
         qInfo.setqType(q.getqType());
         qInfo.setqAlp((byte)q.getqAlp());
-        qInfo.setqNum((byte)q.getqNum());
+        qInfo.setqNum((short) q.getqNum());
         byte copy=0x01;
         short waitQ=q.getWaitq();
         short waitTime=q.getEstWaitSec();
         short numPrint=0;
+        int qbh=((q.getqNum()>>8)&0xFF);
+        int qbl=(q.getqNum()&0xFF);
 
         byte[] sbytes=new byte[1024*2];
         idx=0;
@@ -129,8 +132,10 @@ Remark: DATETIME[7]=YYYY-MM-DD-hh-mm-ss
         //---Queue
         sbytes[idx++]=qInfo.getqType();
         sbytes[idx++]=qInfo.getqAlp();
-        sbytes[idx++]=Convert.GetByteHigh(qInfo.getqNum());
-        sbytes[idx++]=Convert.GetByteLow(qInfo.getqNum());
+        //sbytes[idx++]=(byte) Convert.GetByteHigh(qInfo.getqNum());
+        //sbytes[idx++]=(byte) Convert.GetByteLow(qInfo.getqNum());
+        sbytes[idx++]=(byte) qbh;
+        sbytes[idx++]=(byte) (qbl&0xFF);
         //---Copy
         sbytes[idx++]=copy;
         //---WaitQ
@@ -194,13 +199,13 @@ Remark: DATETIME[7]=YYYY-MM-DD-hh-mm-ss
                         EventBus.getDefault().post(new DebugMessageEvent("tcpClient_QTOUCH Rev data="+message+" len="+rBytes.length));
 
                             EventBus.getDefault().post(new DebugMessageEvent("tcpClient_QTOUCH Rev...OK"));
-                            byte cmd=rBytes[3];
+                            byte cmd=(byte) rBytes[3];
                             switch (cmd) {
                                 case Protocol.QTOUCH_CMD.REQUEST_Q:
                                 //---Print Queue
                                 QTicketInfo info = new QTicketInfo();
                                 int idx = 17;
-                                short year = Convert.GetShort((byte) rBytes[idx++], (byte) rBytes[idx++]);
+                                short year = (short) Convert.GetShort((byte) rBytes[idx++], (byte) rBytes[idx++]);
                                 byte yy = 0;
                                 Log.d(TAG, "year="+year);
                                 //yy = (byte)(year%2000);
@@ -210,18 +215,24 @@ Remark: DATETIME[7]=YYYY-MM-DD-hh-mm-ss
 
                                 info.setDivId(divId);
                                 info.setYear(yy);
-                                info.setMonth(rBytes[idx++]);
-                                info.setDate(rBytes[idx++]);
-                                info.setHour(rBytes[idx++]);
-                                info.setMinute(rBytes[idx++]);
+                                info.setMonth((byte) rBytes[idx++]);
+                                info.setDate((byte) rBytes[idx++]);
+                                info.setHour((byte) rBytes[idx++]);
+                                info.setMinute((byte) rBytes[idx++]);
                                 info.setSecond((byte) rBytes[idx++]);
                                 info.setqType((byte) rBytes[idx++]);
                                 info.setqAlp((byte) rBytes[idx++]);
-                                info.setqNum(Convert.GetQNo(rBytes[idx++], rBytes[idx++]));
+                                //short qNum= (short) Convert.GetShort((byte) rBytes[idx++], (byte) rBytes[idx++]);
+                                int qbh=((rBytes[idx++])&0xFF);
+                                int qbl=(rBytes[idx++]&0xFF);
+                                int qNum= (((qbh<<8)&0xFF00)|qbl)&0xFFFF;
+
+                                info.setqNum((short)qNum);
+                                //info.setqNum((short) Convert.GetQNo((byte) rBytes[idx++], (byte) rBytes[idx++]));
                                 info.setCopy((byte) rBytes[idx++]);
-                                info.setWaitQ(Convert.GetShort(rBytes[idx++], rBytes[idx++]));
-                                info.setWaitTime(Convert.GetShort(rBytes[idx++], rBytes[idx++]));
-                                info.setNumPrint(Convert.GetShort(rBytes[idx++], rBytes[idx++]));
+                                info.setWaitQ((short) Convert.GetShort((byte) rBytes[idx++], (byte) rBytes[idx++]));
+                                info.setWaitTime((short) Convert.GetShort((byte) rBytes[idx++], (byte) rBytes[idx++]));
+                                info.setNumPrint((short) Convert.GetShort((byte) rBytes[idx++], (byte) rBytes[idx++]));
                                 //GData.qTicketInfo=new QTicketInfo();
                                 GData.qTicketInfo=info;
                                 GData.qTicketInfo.setActivePrint(true);

@@ -27,4 +27,26 @@ public class ViewLogMgr {
         else
             EventBus.getDefault().post(new DebugMessageEvent("Counterlog is null"));
     }
+
+    public static  void ShowPeriperal() {
+
+        if (GData.PeriperalInfos != null)
+            EventBus.getDefault().post(new DebugMessageEvent("Periperal.Size=" + GData.PeriperalInfos.size()));
+        else
+            EventBus.getDefault().post(new DebugMessageEvent("Periperal is null"));
+    }
+    public static  void ShowStaMapGroup() {
+
+        if (GData.StaMapGroupInfos!= null)
+            EventBus.getDefault().post(new DebugMessageEvent("StaMapGroupInfos.Size=" + GData.StaMapGroupInfos.size()));
+        else
+            EventBus.getDefault().post(new DebugMessageEvent("StaMapGroupInfos is null"));
+    }
+    public static  void ShowDivMapGroup() {
+
+        if (GData.DivMapGroupInfos!= null)
+            EventBus.getDefault().post(new DebugMessageEvent("DivMapGroupInfos.Size=" + GData.DivMapGroupInfos.size()));
+        else
+            EventBus.getDefault().post(new DebugMessageEvent("DivMapGroupInfos is null"));
+    }
 }

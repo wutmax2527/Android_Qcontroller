@@ -34,6 +34,10 @@ import th.co.infinitecorp.www.qcontroller.DataInfo.MASTER.PF_OTHER;
 import th.co.infinitecorp.www.qcontroller.DataInfo.MASTER.PF_STAMAP;
 import th.co.infinitecorp.www.qcontroller.DataInfo.MASTER.StaInfo;
 import th.co.infinitecorp.www.qcontroller.DataInfo.MASTER.UserInfo;
+import th.co.infinitecorp.www.qcontroller.DataInfo.Mapping.DivMapGroupInfo;
+import th.co.infinitecorp.www.qcontroller.DataInfo.Mapping.StaMapGroupInfo;
+import th.co.infinitecorp.www.qcontroller.DataInfo.PeriperalInfo;
+import th.co.infinitecorp.www.qcontroller.QClientWeb.QClientOnWebService;
 import th.co.infinitecorp.www.qcontroller.Utils.DateTime;
 import th.co.infinitecorp.www.qcontroller.Utils.ExternalStorage;
 import th.co.infinitecorp.www.qcontroller.Utils.FileName;
@@ -53,7 +57,8 @@ public class LogMgr {
         QueueInfo updateQ=QueueMgr.NEW_QUEUE();
         Integer index=0;
         for (QueueInfo q:GData.Queue) {
-            if(QueueMgr.Check_SameQueue(q,ALLQ)&& ALLQ.getStatus()==oldQstatus) {
+            //if(QueueMgr.Check_SameQueue(q,ALLQ)&& ALLQ.getStatus()==oldQstatus) {
+            if(QueueMgr.Check_SameQueue(q,ALLQ)) {
                 updateQ=ALLQ;
                found=true;
               break;
@@ -621,6 +626,7 @@ public class LogMgr {
     public static boolean Delete_CounterlogInfo(Context context){
         return ExternalStorage.deleteFile(new File(context.getExternalFilesDir(FolderPath.MASTER), FileName.Counterlog_JSON));
     }
+
     //---CurrentStationInfo
     public  static boolean Save_CurrentStationInfo(Context context, List<CurrentStationInfo> infos) {
         Type type=new TypeToken<List<CurrentStationInfo>>(){}.getType();
@@ -642,6 +648,7 @@ public class LogMgr {
     public static boolean Delete_CurrentStationInfo(Context context){
         return ExternalStorage.deleteFile(new File(context.getExternalFilesDir(FolderPath.MASTER), FileName.CurrentStationInfo_JSON));
     }
+
     //---CurrentDivisionInfo
     public  static boolean Save_CurrentDivisionInfo(Context context, List<CurrentDivisionInfo> infos) {
         Type type=new TypeToken<List<CurrentDivisionInfo>>(){}.getType();
@@ -663,6 +670,7 @@ public class LogMgr {
     public static boolean Delete_CurrentDivisionInfo(Context context){
         return ExternalStorage.deleteFile(new File(context.getExternalFilesDir(FolderPath.MASTER), FileName.CurrentDivisionInfo_JSON));
     }
+
     //---CurrentGroupInfo
     public  static boolean Save_CurrentGroupInfo(Context context, List<CurrentGroupInfo> infos) {
         Type type=new TypeToken<List<CurrentGroupInfo>>(){}.getType();
@@ -672,7 +680,7 @@ public class LogMgr {
     }
     public static List<CurrentGroupInfo> Load_CurrentGroupInfo(Context context) {
         String strData=ExternalStorage.readFile(new File(context.getExternalFilesDir(FolderPath.MASTER), FileName.CurrentGroupInfo_JSON));
-        Type type=new TypeToken<List<CounterlogInfo>>(){}.getType();
+        Type type=new TypeToken<List<CurrentGroupInfo>>(){}.getType();
         if(!strData.equals("")) {
             Gson gson=new Gson();
             List<CurrentGroupInfo> listLog=gson.fromJson(strData,type);
@@ -683,5 +691,98 @@ public class LogMgr {
     }
     public static boolean Delete_CurrentGroupInfo(Context context){
         return ExternalStorage.deleteFile(new File(context.getExternalFilesDir(FolderPath.MASTER), FileName.CurrentGroupInfo_JSON));
+    }
+
+    //---PeriperalInfo
+    public  static boolean Save_PeriperalInfo(Context context, List<PeriperalInfo> infos) {
+        Type type=new TypeToken<List<PeriperalInfo>>(){}.getType();
+        Gson gson=new Gson();
+        String json="";
+        if(infos!=null)
+          json=gson.toJson(infos,type);
+
+        return ExternalStorage.writeFile(new File(context.getExternalFilesDir(FolderPath.MASTER), FileName.PeriperalInfo_JSON),json);
+    }
+    public static List<PeriperalInfo> Load_PeriperalInfo(Context context) {
+        String strData=ExternalStorage.readFile(new File(context.getExternalFilesDir(FolderPath.MASTER), FileName.PeriperalInfo_JSON));
+        Type type=new TypeToken<List<PeriperalInfo>>(){}.getType();
+        if(!strData.equals("")) {
+            Gson gson=new Gson();
+            List<PeriperalInfo> listLog=gson.fromJson(strData,type);
+            return  listLog;
+        }
+        List<PeriperalInfo> list=new ArrayList<>();
+        return list;
+    }
+    public static boolean Delete_PeriperalInfo(Context context){
+        return ExternalStorage.deleteFile(new File(context.getExternalFilesDir(FolderPath.MASTER), FileName.PeriperalInfo_JSON));
+    }
+
+
+    //---StaMapGroupInfo
+    public  static boolean Save_StaMapGroupInfo(Context context, List<StaMapGroupInfo> infos) {
+        Type type=new TypeToken<List<StaMapGroupInfo>>(){}.getType();
+        Gson gson=new Gson();
+        String json=gson.toJson(infos,type);
+        return ExternalStorage.writeFile(new File(context.getExternalFilesDir(FolderPath.MASTER), FileName.StaMapGroupInfo_JSON),json);
+    }
+    public static List<StaMapGroupInfo> Load_StaMapGroupInfo(Context context) {
+        String strData=ExternalStorage.readFile(new File(context.getExternalFilesDir(FolderPath.MASTER), FileName.StaMapGroupInfo_JSON));
+        Type type=new TypeToken<List<StaMapGroupInfo>>(){}.getType();
+        if(!strData.equals(""))
+        {
+            Gson gson=new Gson();
+            List<StaMapGroupInfo> listLog=gson.fromJson(strData,type);
+            return  listLog;
+        }
+        List<StaMapGroupInfo> list=new ArrayList<>();
+        return list;
+    }
+    public static boolean Delete_StaMapGroupInfo(Context context){
+        return ExternalStorage.deleteFile(new File(context.getExternalFilesDir(FolderPath.MASTER), FileName.StaMapGroupInfo_JSON));
+    }
+    //---DivMapGroupInfo
+    public  static boolean Save_DivMapGroupInfo(Context context, List<DivMapGroupInfo> infos) {
+        Type type=new TypeToken<List<DivMapGroupInfo>>(){}.getType();
+        Gson gson=new Gson();
+        String json=gson.toJson(infos,type);
+        return ExternalStorage.writeFile(new File(context.getExternalFilesDir(FolderPath.MASTER), FileName.DivMapGroupInfo_JSON),json);
+    }
+    public static List<DivMapGroupInfo> Load_DivMapGroupInfo(Context context) {
+        String strData=ExternalStorage.readFile(new File(context.getExternalFilesDir(FolderPath.MASTER), FileName.DivMapGroupInfo_JSON));
+        Type type=new TypeToken<List<DivMapGroupInfo>>(){}.getType();
+        if(!strData.equals(""))
+        {
+            Gson gson=new Gson();
+            List<DivMapGroupInfo> listLog=gson.fromJson(strData,type);
+            return  listLog;
+        }
+        List<DivMapGroupInfo> list=new ArrayList<>();
+        return list;
+    }
+    public static boolean Delete_DivMapGroupInfo(Context context){
+        return ExternalStorage.deleteFile(new File(context.getExternalFilesDir(FolderPath.MASTER), FileName.DivMapGroupInfo_JSON));
+    }
+
+    //---StationSetting
+    public  static boolean Save_StationSetting(Context context, List<QClientOnWebService.STATION> infos) {
+        Type type=new TypeToken<List<QClientOnWebService.STATION>>(){}.getType();
+        Gson gson=new Gson();
+        String json=gson.toJson(infos,type);
+        return ExternalStorage.writeFile(new File(context.getExternalFilesDir(FolderPath.MASTER), FileName.QClientWebStationSetting_JSON),json);
+    }
+    public static List<QClientOnWebService.STATION> Load_StationSetting(Context context) {
+        String strData=ExternalStorage.readFile(new File(context.getExternalFilesDir(FolderPath.MASTER), FileName.QClientWebStationSetting_JSON));
+        Type type=new TypeToken<List<QClientOnWebService.STATION>>(){}.getType();
+        if(!strData.equals("")) {
+            Gson gson=new Gson();
+            List<QClientOnWebService.STATION> listLog=gson.fromJson(strData,type);
+            return  listLog;
+        }
+        List<QClientOnWebService.STATION> list=new ArrayList<>();
+        return list;
+    }
+    public static boolean Delete_StationSetting(Context context){
+        return ExternalStorage.deleteFile(new File(context.getExternalFilesDir(FolderPath.MASTER), FileName.QClientWebStationSetting_JSON));
     }
 }

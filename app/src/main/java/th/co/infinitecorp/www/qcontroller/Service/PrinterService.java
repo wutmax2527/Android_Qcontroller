@@ -26,6 +26,11 @@ public class PrinterService implements IPrinterService {
         this.dataReceivedListener = listener;
     }
 
+    public interface ResponseDataListener {
+        void onResponseDataResult(byte frameStatus,byte[] bytes);
+    }
+    ResponseDataListener responseDataListener;
+
     @Override
     public OnDataReceivedListener getDataReceivedListener() {
         return null;
@@ -98,7 +103,7 @@ public class PrinterService implements IPrinterService {
         int idx=0;
 
         byte[] b = Arrays.copyOf(bytes, idx);
-        return Protocol.prepareData_Protocol_V1(Protocol.QPRINT_CMD.SYNC,Protocol.Uart_Address.Printer1,b);
+        return Protocol.prepareData_Protocol_V1(Protocol.QPRINT_CMD.QUERY,Protocol.Uart_Address.Printer1,b);
     }
 
     /*PrintQTicket*/
@@ -123,7 +128,7 @@ public class PrinterService implements IPrinterService {
                         byte resp=Protocol.Verifed_DataFrame(bytes);
                         if(resp==Protocol.FRAME_STATUS.CORRECT) {
                             byte cmd=bytes[4];
-                            if(cmd==Protocol.QPRINT_CMD.PRINT_QTICKET)
+                            if(cmd==Protocol.QPRINT_CMD.QTICKET)
                                 EventBus.getDefault().post(new DebugMessageEvent("***PrintQ_Serial Rev OK***"));
                             else
                                 EventBus.getDefault().post(new DebugMessageEvent("***PrintQ_Serial Rev CMD Fail***"));
@@ -157,75 +162,34 @@ public class PrinterService implements IPrinterService {
         thread.start();
         return false;
     }
-    private  boolean printQTicketOnQPrint2(final Uart uart,final byte ticketId,final QTicketInfo info,final PrinterService printerService) {
-       while (true) {
-           byte[] bytes = preparePrintQTicket(ticketId, info);
-           String str = Convert.ByteArrayToHexStringWithSpace(bytes);
-           EventBus.getDefault().post(new DebugMessageEvent("PrintQ_Serial Send Hex:" + str));
-           uart.SendReceive_Byte(500, bytes, true);
-           uart.setOnDataReceivedListener(new Uart.OnDataReceivedListener() {
-               @Override
-               public boolean onDataReceived(byte[] bytes) {
 
-                   String str = Convert.ByteArrayToHexStringWithSpace(bytes);
-                   EventBus.getDefault().post(new DebugMessageEvent("PrintQ_Serial Rev Len=" + bytes.length + " Hex=" + str));
-                   byte resp = Protocol.Verifed_DataFrame(bytes);
-                   if (resp == Protocol.FRAME_STATUS.CORRECT) {
-                       byte cmd = bytes[4];
-                       if (cmd == Protocol.QPRINT_CMD.PRINT_QTICKET)
-                           EventBus.getDefault().post(new DebugMessageEvent("***PrintQ_Serial Rev OK***"));
-                       else
-                           EventBus.getDefault().post(new DebugMessageEvent("***PrintQ_Serial Rev CMD Fail***"));
-                   } else {
-                       EventBus.getDefault().post(new DebugMessageEvent("***PrintQ_Serial Rev Fail=" + resp));
-                   }
-                        /*
-                        new Handler(Looper.getMainLooper()).post(new Runnable() {
-                            public void run() {
-                                printerService.getDataReceivedListener().onDataReceived(true);
-                            }
-                        });
-                        */
-                   return true;
-               }
-
-               @Override
-               public boolean onReceiveFail(byte[] bytes) {
-                   EventBus.getDefault().post(new DebugMessageEvent("***PrintQ_Serial Rev TimeOut***"));
-                        /*
-                        new Handler(Looper.getMainLooper()).post(new Runnable() {
-                            public void run() {
-                                printerService.getDataReceivedListener().onDataReceived(false);
-                            }
-                        });
-                        */
-                   return false;
-               }
-           });
-           break;
-       }
-
-        return false;
-    }
     private static   byte[] preparePrintQTicket(byte ticketId, QTicketInfo info) {
         byte[] bytes=new byte[1024*2];
         int idx=0;
+        int tckId=0;;
+        if(ticketId>0)
+            tckId=(ticketId-1);
         /*
         STX-ADDR-LEN[2]-CMD-ticketId-copies-type-lang-Qno[4]-waitQ2bytes
                 -Date-Month-Year-hh-mm-ss-aprxServeTime2bytes-numPrint2bytes
                 -Prt1_type-Prt1_len(2)-Prt1_Data
                 */
+        byte qType=info.getqType();
+        if(info.getqNum()>999)
+            qType=1;
+        int qbh=((info.getqNum()>>8)&0xFF);
+        int qbl=(info.getqNum()&0xFF);
         //Testing Fix Data
-        bytes[idx++]=ticketId; //Ticket ID
+        bytes[idx++]=(byte) tckId; //Ticket ID
         bytes[idx++]=info.getCopy();
 
         bytes[idx++]=0;  //None
         bytes[idx++]=0;  //None
 
-        bytes[idx++]=info.getqType();
+        bytes[idx++]=qType;
         bytes[idx++]=info.getqAlp();
-        bytes[idx++]=Convert.GetByteHigh(info.getqNum());
-        bytes[idx++]=Convert.GetByteLow(info.getqNum());
+        bytes[idx++]=(byte) qbh;//;(byte) Convert.GetByteHigh(info.getqNum());
+        bytes[idx++]=(byte) qbl;//(byte) Convert.GetByteLow(info.getqNum());
 
         bytes[idx++]=Convert.GetByteHigh(info.getWaitQ());
         bytes[idx++]=Convert.GetByteLow(info.getWaitQ());
@@ -247,7 +211,7 @@ public class PrinterService implements IPrinterService {
         bytes[idx++]=0x00;
 
         byte[] b = Arrays.copyOf(bytes, idx);
-        return Protocol.prepareData_Protocol_V1(Protocol.QPRINT_CMD.PRINT_QTICKET,Protocol.Uart_Address.Printer1,b);
+        return Protocol.prepareData_Protocol_V1(Protocol.QPRINT_CMD.QTICKET,Protocol.Uart_Address.Printer1,b);
     }
 
     /*Print Maintenance*/
@@ -298,10 +262,58 @@ public class PrinterService implements IPrinterService {
         bytes[idx++]=0x01;
 
         byte[] b = Arrays.copyOf(bytes, idx);
-        return Protocol.prepareData_Protocol_V1(Protocol.QPRINT_CMD.PRINT_MAINTENANCE_REPORT,Protocol.Uart_Address.Printer1,b);
+        return Protocol.prepareData_Protocol_V1(Protocol.QPRINT_CMD.MAINTENANCE_REPORT,Protocol.Uart_Address.Printer1,b);
     }
     private static byte[] prepareDataForSend(byte cmd,byte deviceId,byte[] bytes) {
         byte[] sBytes= Protocol.prepareData_Protocol_V1(cmd,deviceId,bytes);
         return sBytes;
     }
+
+    /*sendFrame_ExtPrinter*/
+    public  void SendFrame_ExtPrinter(Uart uart,byte[] sbytes,final  ResponseDataListener listener) {
+        boolean resp=false;
+       this.responseDataListener=listener;
+        EventBus.getDefault().post(new DebugMessageEvent("sendFrame_ExtPrinter"));
+        if(uart==null)
+            listener.onResponseDataResult(Protocol.FRAME_STATUS.TIMEOUT,null);
+        else {
+            uart.SendReceive_Byte(500, sbytes, true);
+            uart.setOnDataReceivedListener(new Uart.OnDataReceivedListener() {
+                @Override
+                public boolean onDataReceived(byte[] bytes) {
+
+                    String str = Convert.ByteArrayToHexStringWithSpace(bytes);
+                    EventBus.getDefault().post(new DebugMessageEvent("Serial Rev Len=" + bytes.length + " Hex=" + str));
+
+                    byte frameStatus = Protocol.FRAME_STATUS.CORRECT;
+                    frameStatus = Protocol.Verifed_DataFrame(bytes);
+                    if (frameStatus == Protocol.FRAME_STATUS.CORRECT) {
+                        EventBus.getDefault().post(new DebugMessageEvent("Serial Rev OK***"));
+                    } else {
+                        EventBus.getDefault().post(new DebugMessageEvent("Serial Rev Status=" + frameStatus));
+                    }
+                    //---Handle Event
+                    if (frameStatus == Protocol.FRAME_STATUS.CORRECT) {
+                        byte cmd = 0x00;
+                        switch (cmd) {
+                            case 0x00:
+                                break;
+                            case 0x01:
+                                break;
+                        }
+                    }
+                    listener.onResponseDataResult(frameStatus, bytes);
+                    return true;
+                }
+
+                @Override
+                public boolean onReceiveFail(byte[] bytes) {
+                    EventBus.getDefault().post(new DebugMessageEvent("Serial Rev Fail!"));
+                    listener.onResponseDataResult(Protocol.FRAME_STATUS.TIMEOUT, bytes);
+                    return false;
+                }
+            });
+        }
+    }
+
 }

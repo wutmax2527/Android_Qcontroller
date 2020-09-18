@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html debug="true">
+<head>
+  <script type="text/javascript">
+           function PrintTicket(divId)
+           {
+		   debugger;
+        	   Android.PrintTicket(divId);
+           }
+		   function init2(data)
+           {
+        	  document.getElementById("txt").innerHTML = data;
+           }
+        </script>
+</script>
+</head>
+<style>
+
+/* Container holding the image and the text */
+.container {
+  position: relative;
+  text-align: center;
+  color: black;
+}
+
+/* Bottom left text */
+.bottom-left {
+  position: absolute;
+  bottom: 8px;
+  left: 16px;
+}
+
+/* Top left text */
+.top-left {
+  position: absolute;
+  top: 8px;
+  left: 16px;
+}
+
+/* Top right text */
+.top-right {
+  position: absolute;
+  top: 8px;
+  right: 16px;
+}
+
+/* Bottom right text */
+.bottom-right {
+  position: absolute;
+  bottom: 8px;
+  right: 16px;
+}
+
+/* Centered text */
+.centered {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  font-size: 8vw;
+}
+</style>
+<body>
+<div class="container">
+	    <br><br><br>
+		<div class="container"">
+			<img src="images/logo.png" style="width:50%;">	   
+		</div>
+		<!--
+		<br><br><br>
+		<div class="col-xs-12" style="text-align:center;color:blue;">	
+			<p><font size="48" id="txt">Infinite Shop</font></p>
+		</div> -->
+		<br><br><br>
+		<div class="container"  onclick= "PrintTicket('1')">
+			<img src="images/button.png" style="width:75%;">
+		    <div class="centered">Service 1</div>
+		</div>
+		<div class="container"  onclick="PrintTicket('2')">
+			<img src="images/button.png" style="width:75%;">
+		    <div class="centered">Service 2</div>
+		</div>
+		<div class="container" onclick="PrintTicket('3')">
+			<img src="images/button.png" style="width:75%;">
+		    <div class="centered">Service 3</div>
+		</div>
+		<div class="container" onclick="PrintTicket('4')">
+			<img src="images/button.png"  style="width:75%;">
+		    <div class="centered">Service 4</div>
+		</div>
+		<br><br><br>
+</div>
+
+
+
+</body>
+</html>
+

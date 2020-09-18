@@ -1,0 +1,117 @@
+================================================================================================
+Protocol(AllSoftkey)
+================================================================================================
+STX=0x02,EOT=0x04,ACK=0x06,NACK=0x15
+================================================================================================
+Sofkey[Qcontroller:6000/9915] <-> [Softkey:6001/Keypad:9001]
+Format:
+     [Sofkey]       ->  STX-LEN[2]-sta-CMD-DATA-SUM-EOT
+     [Qcontroller]  ->  STX-LEN[2]-sta-CMD-DATA-SUM-EOT
+     [Sofkey]       ->  STX-LEN[2]-sta-CMD-DATA-SUM-EOT
+                 ......
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+------------------------------------------------------------------------------------------------
+[STARTUP=0x2B]
+    [Sofkey]      -> stx-bh-bl-sta-STARTUP-SubCmd_groupinfo-sum-eot
+    [Qcontroller] -> stx-bh-bl-sta-STARTUP-SubCmd_groupinfo-GroupID…-sum-eot
+------------------------------------------------------------------------------------------------
+[LOGON=0x0E]
+    [Sofkey]      -> stx-bh-bl-sta-LogOn-Ulen_H-Ulen_L-User[](unicode)-Plen_H-Plen_L-Pass[](unicode)-chkSum-eot
+ 	[Qcontroller] -> stx-bh-bl-sta-LogOn-VALID/INVALID-userName-sum-eot
+------------------------------------------------------------------------------------------------
+[PAUSE=0x07]
+    [Sofkey]      -> stx-bh-bl-sta-PAUSE-sum-eot
+ 	[Qcontroller] -> stx-bh-bl-sta-PAUSE-Ack-sum-eot
+------------------------------------------------------------------------------------------------
+[NEXT=0x09]
+    [Sofkey]      -> stx-bh-bl-sta-NEXT-sum-eot
+  	[Qcontroller] -> stx-bh-bl-sta-NEXT-QType-Qnum3byte-Qdiv-prevDiv-waitSec[2]-sum-eot
+    [Sofkey]      -> stx-bh-bl-sta-NEXT-ACK-sum-eot
+------------------------------------------------------------------------------------------------
+[RECALL=0x0A]
+    [Sofkey]      -> stx-bh-bl-sta-Recall-Qnum3byte-sum-eot
+    [Qcontroller] -> stx-bh-bl-sta-Recall-Ack-sum-eot
+------------------------------------------------------------------------------------------------
+[DIRECT_CALL=0x02]
+    [Sofkey]      -> stx-bh-bl-sta-DIRECT-Qtype-Qnum3byte-sum-eot
+    [Qcontroller] -> stx-bh-bl-sta-DIRECT-Qtype-Qdiv-Ack-sum-eot
+------------------------------------------------------------------------------------------------
+[ENDTRANS=0x11]
+    [Sofkey]      -> stx-bh-bl-sta-ENDTRANS-sum-eot
+    [Qcontroller] -> stx-bh-bl-sta-ENDTRANS-ACK-sum-eot
+------------------------------------------------------------------------------------------------
+[CANCEL=0x03]
+    [Sofkey]      -> stx-bh-bl-sta-CANCEL-Qnum3byte-sum-eot
+    [Qcontroller] -> stx-bh-bl-sta-CANCEL-Ack-sum-eot
+------------------------------------------------------------------------------------------------
+[HOLD=0x08]
+    [Sofkey]      -> stx-bh-bl-sta-HOLD-Qnum3byte-sum-eot
+    [Qcontroller] -> stx-bh-bl-sta-HOLD-Ack-sum-eot
+------------------------------------------------------------------------------------------------
+[CALL_HOLD=0x0B]
+    [Sofkey]      -> stx-bh-bl-sta-CallHold-sum-eot
+    [Qcontroller] -> stx-bh-bl-sta-CallHold-QType-Qnum3byte-Qdiv-pvDiv-holdSec2byte-sum-eot
+    [Sofkey]      -> stx-bh-bl-sta-CallHold-Ack-sum-eot
+------------------------------------------------------------------------------------------------
+[TRANSFER=0x04]
+    [Sofkey]      -> stx-bh-bl-sta-TRANSFER-Qnum3byte-TARGET_DIV-sum-eot
+    [Qcontroller] -> stx-bh-bl-sta-TRANSFER-Ack-sum-eot
+------------------------------------------------------------------------------------------------
+[TRANSFER_STA=0xF1]
+    [Sofkey]      -> stx-bh-bl-sta-TRANSFER_STA-Qtype-Qnum(3bytes)-sum-eot
+    [Qcontroller] -> stx-bh-bl-sta-TRANSFER_STA-Ack-sum-eot
+------------------------------------------------------------------------------------------------
+[BREAK=0xFF]
+    [Sofkey]      -> stx-bh-bl-sta-BREAK-reasonId-breakreason...-sum-eot
+    [Qcontroller] -> stx-bh-bl-sta-BREAK-Ack-sum-eot
+------------------------------------------------------------------------------------------------
+[TRNSC=0x01]
+     [Sofkey]      -> stx-bh-bl-sta-TRNSC-transNo-sum-eot
+     [Qcontroller] -> stx-bh-bl-sta-TRNSC-Ack-sum-eot
+------------------------------------------------------------------------------------------------
+[ACALL=0x06]:Help
+     [Sofkey]      -> stx-bh-bl-sta-ACALL-sum-eot
+     [Qcontroller] -> stx-bh-bl-sta-ACALL-Ack-sum-eot
+------------------------------------------------------------------------------------------------
+[GROUP_CALL=0x0F]:
+     [Sofkey]      -> stx-bh-bl-sta-GROUPCALL-code-Qdata-sum-eo
+     [Qcontroller] -> stx-bh-bl-sta-GROUPCALL-Ack-sum-
+    Remark:
+    			//if Code = 0x00
+    			//		Qdata = StartQ3byte,endQ3byte,station
+    			//else
+    			//		Code = total Q number
+    			//		Qdata = Q1,Q2,Q3…,station;
+    			//----------------------------------------------
+------------------------------------------------------------------------------------------------
+[WALK_DIRECT=0x10]:
+     [Sofkey]      -> stx-bh-bl-sta-WALKDIRECT-Qdiv-sum-eot
+     [Qcontroller] -> stx-bh-bl-sta-WALKDIRECT-QType-Qnum3byte-sum-eot
+     [Sofkey]      -> stx-bh-bl-sta-WALKDIRECT-ACK-0x00-sum-eot
+------------------------------------------------------------------------------------------------
+[CHANGEGROUP=0x12]
+     [Sofkey]      -> stx-bh-bl-sta-CHANGEGROUP-newGROUP-sum-eot
+     [Qcontroller] -> stx-bh-bl-sta-CHANGEGROUP-ACK-sum-eot
+------------------------------------------------------------------------------------------------
+[SUBDIV=0x13]
+     [Sofkey]      -> stx-bh-bl-sta-SUBDIV-subDivNumber-sum-eot
+     [Qcontroller] -> stx-bh-bl-sta-Subdiv-Ack-sum-eo
+------------------------------------------------------------------------------------------------
+[TERMINATE=0x2C]
+     [Sofkey]      -> stx-bh-bl-sta-TERMINATE-sum-eot
+     [Qcontroller] -> stx-bh-bl-sta-TERMINATE-Ack-sum-eot
+------------------------------------------------------------------------------------------------
+[VOTE=0x50]
+     [Sofkey]      -> stx-bh-bl-sta-VOTE-sum-eot
+     [Qcontroller] -> stx-bh-bl-sta-VOTE-Ack-sum-eot
+------------------------------------------------------------------------------------------------
+================================================================================================
+(AllSoftkey:Update Data)
+Sofkey[Qcontroller Port:9915]
+Format:
+     [Qcontroller] -> stx-bh-bl-sta-Data-sum-eot
+
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+------------------------------------------------------------------------------------------------

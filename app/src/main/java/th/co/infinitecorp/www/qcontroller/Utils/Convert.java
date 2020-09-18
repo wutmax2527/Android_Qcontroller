@@ -52,9 +52,28 @@ public class Convert {
         return  chars;
     }
     public  static byte[] CharToByteArray(char[] chars) {
+
         byte[] bytes=new byte[chars.length];
         for(int i=0;i < chars.length;i++){
             bytes[i]=(byte) chars[i];
+        }
+
+         return  bytes;
+
+        /*
+        int[] bytes=new int[chars.length];
+        for(int i=0;i < chars.length;i++){
+            bytes[i]= (int)chars[i];
+        }
+        return  bytes;
+        */
+    }
+    public  static int[] CharToIntArray(char[] chars) {
+
+        int[] bytes=new int[chars.length];
+        for(int i=0;i < chars.length;i++){
+            int d=chars[i]&0xFF;
+            bytes[i]= d;
         }
         return  bytes;
     }
@@ -75,29 +94,32 @@ public class Convert {
     }
 
     /*Queue Converter*/
-    public static byte GetByteHigh(Short s)
-    {
+    public static byte GetByteHigh(Short s) {
       return (byte)((s>>8)&0xFF);
     }
-    public static byte GetByteLow(Short s)
-    {
+    public static byte GetByteLow(Short s) {
+        int sL=(s&0xFF);
+        //return (byte)sL;
         return (byte)(s&0xFF);
     }
-    public static byte GetByteHigh(int s)
-    {
+    public static byte GetByteHigh(int s) {
+        int sH=((s>>8)&0xFF);
+        //return (byte) sH;
         return (byte)((s>>8)&0xFF);
     }
-    public static byte GetByteLow(int s)
-    {
+    public static byte GetByteLow(int s) {
         return (byte)(s&0xFF);
     }
-    public static short GetQNo(byte qH,byte qL)
-    {
+    public static short GetQNo(byte qH,byte qL) {
         return (short) (((((byte)qH&0xFF)<<8)|((byte)qL&0xFF)));
     }
-    public static short GetShort(byte bh,byte bl)
-    {
-        return (short) (((((byte)bh&0xFF)<<8)|((byte)bl&0xFF)));
+    public static int GetShort(int bh,int bl) {
+        int sbh=(((bh&0xFF)<<8)&0xFF00);
+        int sbL=(bl&0xFF);
+        int data=(sbh|sbL)&0xFFFF;
+        return  data;
+        //return (short) (((((byte)bh&0xFF)<<8)|((byte)bl&0xFF)));
+        //return  ((((bh&0xFF)<<8)|(bl&0xFF)));
     }
 
     public static String QNumberToString(byte qType,byte qAlp,short qNum) {

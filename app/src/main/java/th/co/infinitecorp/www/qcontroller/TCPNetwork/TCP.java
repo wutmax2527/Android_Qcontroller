@@ -10,6 +10,13 @@ public class TCP {
             final public static int QTOUCH = 20004;
             final public static int QDISPLAY = 20005;
             final public static int Periperal = 20006;
+            final public static int SoftkeyCMD = 6000;
+            final public static int SoftkeyUpdate = 9915;
+            final public static int Web = 8080;
+            final public static int WS_QClientWeb = 20500;
+            final public static int QClientWeb = 20501;
+            final public static int WS_QTouchWeb = 20600;
+            final public static int QTouchWeb = 20601;
         }
     }
     public class Client{

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Test Print</title>
+</head>
+<body>
+<button onclick="doSend()" style="width: 200px;height: 50px"></button>
+<script type="text/javascript">
+	var wsUri = "ws://127.0.0.1:" + 20600 + "/Connect";
+        var websocket;
+        doConnect();
+        function doConnect() {
+            try {
+                if (window.MozWebSocket) {
+                    openAlet('Info', 'This browser supports WebSocket using the MozWebSocket constructor');
+                    window.WebSocket = window.MozWebSocket;
+                }
+                else if (!window.WebSocket) {
+                    openAlet('ERROR', 'This browser does not have support for WebSocket');
+                    return;
+                }
+                websocket = new WebSocket(wsUri);
+                websocket.onopen = function (evt) { onOpen(evt) };
+                websocket.onclose = function (evt) { onClose(evt) };
+                websocket.onmessage = function (evt) { onMessage(evt) };
+                websocket.onerror = function (evt) { onError(evt) };
+
+            } catch (ex) {
+                console.log(ex)
+                //console.error(ex);
+            }
+        }
+
+        function onOpen(evt) {
+            alert("CONNECTED");
+        }
+
+        function onClose(evt) {
+            alert("DISCONNECTED");
+        }
+
+        function onMessage(evt) {
+            var dataMge = JSON.parse(evt.data);
+            console.log(dataMge) ;   
+        }
+
+        function onError(evt) {
+        }
+
+        function doSend() {
+            
+            var messageSend = '{"CardID" : "1","DivID":1,"IsPrint":"true","IsVDOcall":"true","LandID":1,"PicData":"test","ProtocolID":36,"Telno":"0123456789"}';
+            websocket.send(messageSend);
+            alert(messageSend);
+        }
+</script>
+</body>
+</html>

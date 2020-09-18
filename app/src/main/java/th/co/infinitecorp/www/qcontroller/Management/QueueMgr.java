@@ -2,6 +2,10 @@ package th.co.infinitecorp.www.qcontroller.Management;
 
 import android.content.Context;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
+
 import th.co.infinitecorp.www.qcontroller.DataInfo.DATANOW.CounterlogInfo;
 import th.co.infinitecorp.www.qcontroller.DataInfo.DATANOW.CurrentDivisionInfo;
 import th.co.infinitecorp.www.qcontroller.DataInfo.DATANOW.CurrentGroupInfo;
@@ -10,6 +14,7 @@ import th.co.infinitecorp.www.qcontroller.DataInfo.DATANOW.QLaunchingInfo;
 import th.co.infinitecorp.www.qcontroller.DataInfo.DATANOW.QueueInfo;
 import th.co.infinitecorp.www.qcontroller.DataInfo.DATANOW.DivisionInfo;
 import th.co.infinitecorp.www.qcontroller.DataInfo.DATANOW.UserlogInfo;
+import th.co.infinitecorp.www.qcontroller.DataInfo.Mapping.DivMapGroupInfo;
 import th.co.infinitecorp.www.qcontroller.DataInfo.QInfo;
 import th.co.infinitecorp.www.qcontroller.Utils.Convert;
 import th.co.infinitecorp.www.qcontroller.Utils.DateTime;
@@ -70,6 +75,12 @@ public class QueueMgr {
         final public static byte TRANSFER_To_DIV = 0x24;
     }
 
+    public static List<QueueInfo> CurrentWaitQ=new ArrayList<>();
+    public static List<QueueInfo> CurrentHoldQ=new ArrayList<>();
+
+    public static boolean IsUpdateWaitingQ =true;
+    public static boolean IsUpdateQStatus =true;
+
     /*Create New Queue*/
     public static QueueInfo NEW_QUEUE() {
         QueueInfo q=new QueueInfo();
@@ -104,7 +115,7 @@ public class QueueMgr {
     public static QueueInfo GetNewQueue(Context context, byte div) {
         QueueInfo q = NEW_QUEUE();
 
-        byte div_alp=0, div_qType=1;
+        byte div_alp=0, div_qType=0;
         short div_qBegin=1, div_qEnd=999, qNum = 0;
 
         if(GData.Division!=null) {
@@ -116,10 +127,16 @@ public class QueueMgr {
                     div_qEnd = division.getqEnd();
 
                     qNum = (short) (division.getqLaunching() + 1);
+
+//                    QLaunchingInfo qLaunchingInfo=new QLaunchingInfo ();
+//                    qLaunchingInfo=GData.QLaunching.get(division.getId() - 1);
+//                    qNum = (short)  (qLaunchingInfo.getqLaunching()+1);
                     break;
                 }
             }
         }
+        if(qNum==0) return  q;
+
         if ((qNum > div_qEnd) || (qNum < div_qBegin))
             qNum = div_qBegin;
 
@@ -127,13 +144,15 @@ public class QueueMgr {
         if(GData.Division!=null) {
             for (DivisionInfo division : GData.Division) {
                 if ((division.getAlphabet() == div_alp) && (division.getqBegin() <= qNum) && (qNum <= division.getqEnd())) {
+                    if(division.getId()<=0) continue;
                     DivisionInfo divisionInfo = new DivisionInfo();
                     divisionInfo = division;
-                    divisionInfo.setqLaunching(qNum);
+                    divisionInfo.setqLaunching((short) qNum);
                     GData.Division.set(divisionInfo.getId() - 1, divisionInfo);
+
                     QLaunchingInfo qLaunchingInfo=new QLaunchingInfo ();
-                    qLaunchingInfo.setqLaunching(qNum);
-                    GData.QLaunching.set(divisionInfo.getId() - 1,qLaunchingInfo);
+                    qLaunchingInfo.setqLaunching((short) qNum);
+                    GData.QLaunching.set(division.getId() - 1,qLaunchingInfo);
                 }
             }
         }
@@ -152,6 +171,8 @@ public class QueueMgr {
         byte stationId=0;
         byte groupId=0;
         byte subdivId=0;
+        if(qNum>999)
+            qType=1;
         if (qStatus == qstatus.qwaiting) {
             //waitQ = CalMinWaitQ(div,ref grpId);
         }
@@ -170,7 +191,7 @@ public class QueueMgr {
         q.setSubdivId(subdivId);
         q.setqAlp(qAlp);
         q.setqType(qType);
-        q.setqNum(qNum);
+        q.setqNum((short)qNum);
         q.setStatus(qStatus);
         q.setQueueNo(Convert.QNumberToString(qType, qAlp,qNum));
         q.setReqDateTime(DateTime.GetDateTimeNow());
@@ -180,8 +201,9 @@ public class QueueMgr {
     }
 
     /*Add Queue Waiting*/
-    private static boolean AddNewWaitQueue(Context context,QueueInfo q) {
-        cal_Qstat();
+    public static boolean AddNewWaitQueue(Context context,QueueInfo q) {
+        //cal_Qstat();
+        UpdateQueueStatChange();
         LogMgr.add_qwaitng(context,q, q.getStatus());
         return true;
     }
@@ -198,10 +220,12 @@ public class QueueMgr {
 
         int[] waitQ=new int[constant.nDiv];
         int[] holdQ=new int[constant.nDiv];
+        int[] servQ=new int[constant.nDiv];
 
         for (Integer i = 0; i < constant.nDiv; i++) {
             waitQ[i]=0x00;
             holdQ[i]=0x00;
+            servQ[i]=0x00;
         }
         int[] staWaitQ=new int[constant.nStation];
         for (Integer i = 0; i < constant.nStation; i++) {
@@ -209,93 +233,164 @@ public class QueueMgr {
         }
 
         for (QueueInfo nextQ:GData.Queue) {
-            if(nextQ.getStatus()==qstatus.qwaiting)
-            {
+            if(nextQ.getStatus()==qstatus.qwaiting) {
                 int divId=nextQ.getDivisionId();
                 if(divId>0)
                     waitQ[divId-1]+=1;
             }
-            if(nextQ.getStatus()==qstatus.qhold)
-            {
+            if(nextQ.getStatus()==qstatus.qhold) {
                 int divId=nextQ.getDivisionId();
                 if(divId>0)
                     holdQ[divId-1]+=1;
             }
-            if(nextQ.getStatus()==qstatus.qwaiting_by_station)
-            {
+            if(nextQ.getStatus()==qstatus.qwaiting_by_station) {
                 int staId=nextQ.getStationId();
                 if(staId>0)
                     staWaitQ[staId-1]+=1;
             }
+            if((nextQ.getStatus()==qstatus.finish_by_next)||(nextQ.getStatus()==qstatus.finish_by_logoff)) {
+                int divId=nextQ.getDivisionId();
+                if(divId>0)
+                    servQ[divId-1]+=1;
+            }
         }
-        for (Integer i = 1; i <= constant.nDiv; i++) {
-            CurrentDivisionInfo curDiv = new CurrentDivisionInfo();
-            curDiv=GData.CurDiv.get(i-1);
-            curDiv.setWaitQ((short) waitQ[i-1]);
-            curDiv.setHoldQ((short) holdQ[i-1]);
-            GData.CurDiv.set(i-1, curDiv);
+        if(GData.CurDiv!=null) {
+            if (GData.CurDiv.size() > 0) {
+                for (Integer i = 0; i < constant.nDiv; i++) {
+                    if (i >= GData.CurDiv.size()) break;
+                    CurrentDivisionInfo curDiv = new CurrentDivisionInfo();
+                    curDiv = GData.CurDiv.get(i);
+                    curDiv.setWaitQ((short) waitQ[i]);
+                    curDiv.setHoldQ((short) holdQ[i]);
+                    curDiv.setServQ((short) servQ[i]);
+                    GData.CurDiv.set(i, curDiv);
+                }
+            }
         }
         int[] waitQGrp=new int[constant.nGroup];
         int[] holdQGrp=new int[constant.nGroup];
+        int[] servQGrp=new int[constant.nGroup];
         for (Integer i = 0; i < constant.nGroup; i++) {
             waitQGrp[i]=0x00;
             holdQGrp[i]=0x00;
+            servQGrp[i]=0x00;
         }
-
+        //---Cal Wait&Hold of Group
+        for(int i=0;i<constant.nGroup;i++) {
+            if (i >= GData.CurDiv.size()) break;
+            waitQGrp[i]=GData.CurDiv.get(i).getWaitQ();
+            holdQGrp[i]=GData.CurDiv.get(i).getHoldQ();
+        }
+        /*
+        //---Test Fix Mapping
         waitQGrp[0]=GData.CurDiv.get(0).getWaitQ();
         holdQGrp[0]=GData.CurDiv.get(0).getHoldQ();
-        waitQGrp[1]=GData.CurDiv.get(0).getWaitQ();
-        holdQGrp[1]=GData.CurDiv.get(0).getHoldQ();
-        waitQGrp[2]=GData.CurDiv.get(0).getWaitQ();
-        holdQGrp[2]=GData.CurDiv.get(0).getHoldQ();
-
-        for (Integer i = 1; i <= constant.nGroup; i++) {
+        waitQGrp[1]=GData.CurDiv.get(1).getWaitQ();
+        holdQGrp[1]=GData.CurDiv.get(1).getHoldQ();
+        waitQGrp[2]=GData.CurDiv.get(2).getWaitQ();
+        holdQGrp[2]=GData.CurDiv.get(2).getHoldQ();
+        */
+        //---Current Group
+        for (Integer i = 0; i < constant.nGroup; i++) {
+            if (i >= GData.CurGrp.size()) break;
             CurrentGroupInfo curGrp = new CurrentGroupInfo();
-            byte grpId=i.byteValue();
-
-            curGrp=GData.CurGrp.get(grpId-1);
-            curGrp.setWaitQ((short) waitQGrp[grpId-1]);
-            curGrp.setHoldQ((short) holdQGrp[grpId-1]);
-            GData.CurGrp.set(grpId-1, curGrp);
-
+            if(GData.CurGrp.get(i)!=null) {
+                curGrp = GData.CurGrp.get(i);
+                curGrp.setWaitQ((short) waitQGrp[i]);
+                curGrp.setHoldQ((short) holdQGrp[i]);
+                GData.CurGrp.set(i, curGrp);
+            }
         }
-        for (Integer i = 1; i <= constant.nStation; i++) {
+        //---Current Station
+        for (Integer i = 0; i < constant.nStation; i++) {
+            if (i >= GData.CurStation.size()) break;
             CurrentStationInfo curSta = new CurrentStationInfo();
-            curSta=GData.CurStation.get(i-1);
-            byte staId=i.byteValue();
+            curSta=GData.CurStation.get(i);
             byte grpId=curSta.getGroupId();
             if(grpId>0) {
+                if (grpId >= GData.CurGrp.size()) continue;
                 curSta.setWaitQ(GData.CurGrp.get(grpId - 1).getWaitQ());
                 curSta.setHoldQ(GData.CurGrp.get(grpId - 1).getHoldQ());
             }
-            curSta.setStaWaitQ((short)staWaitQ[i-1]);
+            curSta.setStaWaitQ((short)staWaitQ[i]);
 
-            GData.CurStation.set(i-1, curSta);
+            GData.CurStation.set(i, curSta);
         }
     }
     public static void UpdateQueueStatChange() {
-        cal_Qstat();
+        //cal_Qstat();
+        IsUpdateWaitingQ=true;
+        IsUpdateQStatus=true;
+    }
 
+    /*Update Waiting Queue*/
+    public static void UpdateWaitingQueue() {
+        /*Current WaitQ&HoldQ*/
+        CurrentWaitQ.clear();
+        CurrentHoldQ.clear();
+        for (QueueInfo q:GData.Queue) {
+
+            if(q.getServid()<=0) continue;
+
+            if(q.getStatus()==qstatus.qwaiting)
+            {
+                CurrentWaitQ.add(q);
+            }
+            if(q.getStatus()==qstatus.qhold)
+            {
+                CurrentHoldQ.add(q);
+            }
+        }
+    }
+
+    /*Update Queue Status*/
+    public static boolean UpdateQueueStatus(Context context, QueueInfo q,byte newQstatus) {
+        return LogMgr.Update_Queue_Status(context,q,q.getStatus(),newQstatus);
     }
 
     /*Search Queue*/
+    public static boolean Search_DivIdOnDivMap(byte DivId,List<DivMapGroupInfo> DivMapGrp) {
+        if(DivMapGrp.size()==0)
+            return false;
+
+        for(DivMapGroupInfo d:DivMapGrp){
+            if(DivId==d.getDIVISION_ID()) {
+                return true;
+            }
+        }
+        return false;
+    }
     public static QueueInfo  Search_Next_Queue(byte sta) {
+        if(sta<=0) return  null;
+
+        CurrentStationInfo curSta=GData.CurStation.get(sta-1);
+        List<DivMapGroupInfo>  divMapGrp=curSta.getDivMapGroup();
+
         QueueInfo q=NEW_QUEUE();
-        //Fix Test
-        /*
-        q.setqType(QInfo.QType.Type_3DG);
-        q.setqAlp((byte)0x41);
-        q.setqNum((short) 3);
-        */
         for (QueueInfo nextQ:GData.Queue) {
+            byte divId=nextQ.getDivisionId();
             if(nextQ.getStatus()==qstatus.qwaiting)
             {
-                q=nextQ;
-                break;
+                if(Search_DivIdOnDivMap(divId,divMapGrp)) {
+                    q = nextQ;
+                    break;
+                }
             }
         }
 
       return q;
+    }
+    public static QueueInfo  Search_Serving_Queue(byte sta) {
+        QueueInfo q=NEW_QUEUE();
+        for (QueueInfo nowQ:GData.Queue) {
+            if((nowQ.getStatus()==qstatus.qcalling_serving)&&(nowQ.getStationId()==sta))
+            //if(nowQ.getStatus()==qstatus.qcalling_serving)
+            {
+                q=nowQ;
+                break;
+            }
+        }
+        return q;
     }
     public static QueueInfo  Search_Hold_Queue(byte sta) {
         QueueInfo q=NEW_QUEUE();
@@ -356,29 +451,76 @@ public class QueueMgr {
         }
         return q;
     }
-
-    public static boolean UpdateQueueStatus(Context context, QueueInfo q,byte newQstatus) {
-        return LogMgr.Update_Queue_Status(context,q,q.getStatus(),newQstatus);
+    public static QueueInfo  Search_Direct_Queue(Integer servId) {
+        QueueInfo q=NEW_QUEUE();
+        for (QueueInfo nowQ:GData.Queue) {
+            if((nowQ.getServid()==servId)&&((nowQ.getStatus()==qstatus.qwaiting)||(nowQ.getStatus()==qstatus.qhold)))
+            {
+                q=nowQ;
+                break;
+            }
+        }
+        return q;
     }
+
+
     /*Finish Queue*/
     public static QueueInfo  Finish_Queue(Context context,byte sta) {
+
+        boolean foundQ=false;
         QueueInfo q=NEW_QUEUE();
         for (QueueInfo lastQ:GData.Queue) {
             if((lastQ.getStatus()==qstatus.qcalling_serving)&&(sta==lastQ.getStationId()))
             {
                 q=lastQ;
+                foundQ=true;
                 break;
             }
         }
-        q.setStationId(sta);
-        q.setEndDateTime(DateTime.GetDateTimeNow());
-        QueueMgr.UpdateQueueStatus(context,q, qstatus.finish_by_next);
+        if(foundQ) {
+            q.setStationId(sta);
+            q.setEndDateTime(DateTime.GetDateTimeNow());
+            QueueMgr.UpdateQueueStatus(context, q, qstatus.finish_by_next);
+        }
         return q;
+    }
+
+    /*Calling Queue*/
+    public static void CallingQueue(Context context,QueueInfo qStart,QueueInfo qEnd,int sta,boolean recall,boolean displayQ) {
+        if(qStart.getqNum()!=0) {
+            if(!recall) {
+                QueueMgr.Finish_Queue(context, (byte) sta);
+
+                qStart.setUserId(UserMgr.Find_CurrentUserByCounterActive(context, (byte) sta).getUserId());
+                qStart.setStationId((byte) sta);
+                qStart.setStDateTime(DateTime.GetDateTimeNow());
+                //qStart.setStatus(QueueMgr.qstatus.qcalling_serving);
+                QueueMgr.UpdateQueueStatus(context, qStart, QueueMgr.qstatus.qcalling_serving);
+
+                CurrentStationInfo curS = new CurrentStationInfo();
+                curS = CounterMgr.Find_CurrentUserByStation(context, (byte) sta);
+                curS.setQueueInfo(qStart);
+                CounterMgr.UpdateCurrentStationStatus(context, (byte) sta, curS);
+            }
+            if(displayQ) {
+                QInfo qS = new QInfo();
+                QInfo qE = new QInfo();
+                byte qType = qStart.getqType();
+                byte qAlp = qStart.getqAlp();
+                qS.setqType(qType);
+                qS.setqAlp(qAlp);
+                qS.setqNum(qStart.getqNum());
+
+                UpdateCallingQueue(qS, qE, (byte) sta);
+            }
+            UpdateQueueStatChange();
+        }
     }
     public static void UpdateCallingQueue(QInfo qStart,QInfo qEnd,byte sta) {
         if(qStart.getqNum()!=0) {
             SoundMgr.UpdateCallingQueue(qStart, qEnd, sta);
             DisplayMgr.UpdateQueueOnDisplay(qStart, qEnd, sta);
+            UpdateQueueStatChange();
         }
     }
 
@@ -487,23 +629,27 @@ public class QueueMgr {
                 }
                 qStart.setStationId(sta);
                 qStart.setEndDateTime(DateTime.GetDateTimeNow());
+                qStart.setStatus(QueueMgr.qstatus.qhold);
                 QueueMgr.UpdateQueueStatus(context, qStart, QueueMgr.qstatus.qhold);
 
                 curS=CounterMgr.Find_CurrentUserByStation(context,sta);
                 curS.setQueueInfo(qStart);
                 CounterMgr.UpdateCurrentStationStatus(context,sta,curS);
                 QueueMgr.UpdateQueueStatChange();
+
                 return true;
             case Protocol.KEYPAD_CMD.CALLHOLD:
                 qStart.setUserId(UserMgr.Find_CurrentUserByCounterActive(context,sta).getUserId());
                 qStart.setStationId(sta);
                 qStart.setStDateTime(DateTime.GetDateTimeNow());
+                qStart.setStatus(qstatus.qcalling_serving);
                 QueueMgr.UpdateQueueStatus(context, qStart, QueueMgr.qstatus.qcalling_serving);
 
                 curS=CounterMgr.Find_CurrentUserByStation(context,sta);
                 curS.setQueueInfo(qStart);
                 CounterMgr.UpdateCurrentStationStatus(context,sta,curS);
                 QueueMgr.UpdateQueueStatChange();
+
                 return true;
             case Protocol.KEYPAD_CMD.CANCEL:
                 if(qStart.getqNum()==0x0000){
@@ -511,6 +657,8 @@ public class QueueMgr {
                 }
                 qStart.setStationId(sta);
                 qStart.setEndDateTime(DateTime.GetDateTimeNow());
+                qStart.setStatus(qstatus.cancelQ);
+                qStart.setStatus(qstatus.qcalling_serving);
                 QueueMgr.UpdateQueueStatus(context, qStart, qstatus.cancelQ);
 
                 curS=CounterMgr.Find_CurrentUserByStation(context,sta);
@@ -538,6 +686,7 @@ public class QueueMgr {
                 qStart.setUserId(UserMgr.Find_CurrentUserByCounterActive(context,sta).getUserId());
                 qStart.setStationId(sta);
                 qStart.setStDateTime(DateTime.GetDateTimeNow());
+                qStart.setStatus(qstatus.qcalling_serving);
                 QueueMgr.UpdateQueueStatus(context, qStart, QueueMgr.qstatus.qcalling_serving);
 
                 curS=CounterMgr.Find_CurrentUserByStation(context,sta);
@@ -606,4 +755,5 @@ public class QueueMgr {
 
         }
     }
+
 }

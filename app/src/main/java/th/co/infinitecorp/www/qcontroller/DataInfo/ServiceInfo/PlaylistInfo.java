@@ -9,6 +9,11 @@ public class PlaylistInfo {
     byte staNo=0x00;
     byte soundType=0x00;
     byte times=0x00;
+    String soundName;
+
+    public PlaylistInfo() {
+        soundName="";
+    }
 
     public Integer getSoundId() {
         return soundId;
@@ -56,5 +61,13 @@ public class PlaylistInfo {
 
     public void setTimes(byte times) {
         this.times = times;
+    }
+
+    public String getSoundName() {
+        return soundName;
+    }
+
+    public void setSoundName(String soundName) {
+        this.soundName = soundName;
     }
 }

@@ -130,6 +130,25 @@ KEY(Ack)->STX-LEN[2]-CMD-FrameID3-DeviceType-DeviceID-FVer[4]-HVer[4]-ACK-STATUS
      KEY->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-FVer[4]-HVer[4]-NONE-STATUS-STA-SUM-EOT
   Server->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-SVer[4]-HVer[4]-ACK-STATUS-STA-CounterStatus-userID[4]-GrpID-WQ[2]-HQ[2]-QNo[4]-QStatus-DivID-len[2]+(Unicode){UserID+"|"NameUser+"|"+GrpID+"|"+GrpName}-SUM-EOT
 ------------------------------------------------------------------------------------------------
+[CHECK_CONNECTION=0x19]
+      KEY->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-FVer[4]-HVer[4]-NONE-STATUS-STA-SUM-EOT
+   Server->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-SVer[4]-HVer[4]-ACK-STATUS-STA-SUM-EOT
+------------------------------------------------------------------------------------------------
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+1.KEYPAD_WIFI(KEY Listen_TCP_PORT 20102):
+Format:
+  Server->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-SVer[4]-HVer[4]-NONE-STATUS-STA-DATA-SUM-EOT
+KEY(Ack)->STX-LEN[2]-CMD-FrameID3-DeviceType-DeviceID-FVer[4]-HVer[4]-ACK-STATUS-STA-DATA-SUM-EOT
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+[CallReserveQ=0xC0]
+     Server->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-SVer[4]-HVer[4]-NONE-STATUS-STA-QNo[4]-SUM-EOT
+   KEY(Ack)->STX-LEN[2]-CMD-FrameID3-DeviceType-DeviceID-FVer[4]-HVer[4]-ACK-STATUS-STA-SUM-EOT
+------------------------------------------------------------------------------------------------
+[RealTimeData=0xD0]
+    Server->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-SVer[4]-HVer[4]-NONE-STATUS-STA-DATA_RealTimeData-SUM-EOT
+  KEY(Ack)->STX-LEN[2]-CMD-FrameID3-DeviceType-DeviceID-FVer[4]-HVer[4]-ACK-STATUS-STA-SUM-EOT
+Remark DATA_RealTimeData:CounterStatus-userID[4]-GrpID-WQ[2]-HQ[2]-QNo[4]-QStatus-DivID-len[2]+(Unicode){UserID+"|"NameUser+"|"+GrpID+"|"+GrpName}
+------------------------------------------------------------------------------------------------
 ================================================================================================
 2.DISPLAY(TCP_PORT 20103):
 Format:
@@ -226,4 +245,120 @@ Format:
 Format:
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ------------------------------------------------------------------------------------------------
+Sofkey
+8)[Qcontroller:6000/9000] <-> [Softkey:6001/Keypad:9001]
+
+		case TRNSC:
+			[Qcontroller] <- stx-bh-bl-sta-TRNSC-transNo-sum-eot <- [KEY]
+			[Qcontroller] -> stx-bh-bl-sta-TRNSC-Ack-sum-eot -> [KEY]
+			break;
+
+		case DIRECT_CALL:
+			[Qcontroller] <- stx-bh-bl-sta-DIRECT-Qtype-Qnum3byte-sum-eot <- [KEY]
+			[Qcontroller] -> stx-bh-bl-sta-DIRECT-Qtype-Qdiv-Ack-sum-eot -> [KEY]
+			break;
+
+		case CANCEL:
+			[Qcontroller] <- stx-bh-bl-sta-CANCEL-Qnum3byte-sum-eot <- [KEY]
+			[Qcontroller] -> stx-bh-bl-sta-CANCEL-Ack-sum-eot -> [KEY]
+			break;
+
+		case TRANSFER:
+			[Qcontroller] <- stx-bh-bl-sta-TRANSFER-Qnum3byte-TARGET DIV-sum-eot <- [KEY]
+			[Qcontroller] -> stx-bh-bl-sta-TRANSFER-Ack-sum-eot -> [KEY]
+			break;
+
+		case ACALL:
+			[Qcontroller] <- stx-bh-bl-sta-ACALL-sum-eot <- [KEY]
+			[Qcontroller] -> stx-bh-bl-sta-ACALL-Ack-sum-eot -> [KEY]
+			break;
+
+		case PAUSE:
+			[Qcontroller] <- stx-bh-bl-sta-PAUSE-sum-eot <- [KEY]
+			[Qcontroller] -> stx-bh-bl-sta-PAUSE-Ack-sum-eot -> [KEY]
+			break;
+
+		case HOLD:
+			[Qcontroller] <- stx-bh-bl-sta-HOLD-Qnum3byte-sum-eot <- [KEY]
+			[Qcontroller] -> stx-bh-bl-sta-HOLD-Ack-sum-eot -> [KEY]
+			break;
+
+		case NEXT:
+			[Qcontroller] <- stx-bh-bl-sta-NEXT-sum-eot <- [KEY]
+			[Qcontroller] -> stx-bh-bl-sta-NEXT-QType-Qnum3byte-Qdiv-prevDiv-waitSec[2]-sum-eot  -> [KEY]
+			[Qcontroller] <- stx-bh-bl-sta-NEXT-ACK-sum-eot <- [KEY]
+			break;
+
+		case RECALL:
+			[Qcontroller]<- stx-bh-bl-sta-Recall-Qnum3byte-sum-eot <- [KEY]
+			[Qcontroller]-> stx-bh-bl-sta-Recall-Ack-sum-eot -> [KEY]
+			break;
+
+		case CALL_HOLD:
+			[Qcontroller]<- stx-bh-bl-sta-CallHold-sum-eot <- [KEY]
+			[Qcontroller]-> stx-bh-bl-sta-CallHold-QType-Qnum3byte-Qdiv-pvDiv-holdSec2byte-sum-eot -> [KEY]
+			[Qcontroller]<- stx-bh-bl-sta-CallHold-Ack-sum-eot <- [KEY]
+			break;
+
+		case LOGON:
+			[Qcontroller]<- stx-bh-bl-sta-LogOn-Id6byte(ASCII-FORMAT)-sum-eot <- [KEY]
+			[Qcontroller]-> stx-bh-bl-sta-LogOn-VALID/INVALID-userName-sum-eot -> [KEY]
+			[Qcontroller]<- stx-bh-bl-sta-LogOn-Ack-sum-eot <- [KEY]
+			break;
+
+		case STARTUP:
+			[Qcontroller]<- stx-bh-bl-sta-STARTUP-sum-eot <- [KEY]
+			[Qcontroller]-> stx-bh-bl-sta-STARTUP-Group-totalDiv-sizeDIV1-div1-DivName1,sizeDIV2,div2,DivName2…-sum-eot -> [KEY]
+			break;
+
+		case GROUP_CALL:
+			[Qcontroller]<- stx-bh-bl-sta-GROUPCALL-code-Qdata-sum-eot <- [KEY]
+			[Qcontroller]<- stx-bh-bl-sta-GROUPCALL-Ack-sum-eot -> [KEY]
+			//----------------------------------------------
+			//if Code = 0x00
+			//		Qdata = StartQ3byte,endQ3byte,station
+			//else
+			//		Code = total Q number
+			//		Qdata = Q1,Q2,Q3…,station;
+			//----------------------------------------------
+			break;
+
+		case WALK_DIRECT:
+			[Qcontroller]<- stx-bh-bl-sta-WALKDIRECT-Qdiv-sum-eot <- [KEY]
+			[Qcontroller]-> stx-bh-bl-sta-WALKDIRECT-QType-Qnum3byte-sum-eot -> [KEY]
+			[Qcontroller]<- stx-bh-bl-sta-WALKDIRECT-ACK-sum-eot <- [KEY]
+			break;
+
+		case ENDTRANS:
+			[Qcontroller]<- stx-bh-bl-sta-ENDTRANS-sum-eot <- [KEY]
+			[Qcontroller]-> stx-bh-bl-sta-ENDTRANS-ACK-sum-eot -> [KEY]
+			break;
+
+		case CHANGEGROUP:
+			[Qcontroller]<-stx-bh-bl-sta-CHANGEGROUP-newGROUP-sum-eot <- [KEY]
+			[Qcontroller]->stx-bh-bl-sta-CHANGEGROUP-ACK-sum-eot -> [KEY]
+			break;
+
+		case SUBDIV:
+			[Qcontroller]<- stx-bh-bl-sta-SUBDIV-subDivNumber-sum-eot <- [KEY]
+			[Qcontroller]-> stx-bh-bl-sta-Subdiv-Ack-sum-eot -> [KEY]
+			break;
+
+		case TERMINATE:
+			[Qcontroller]<-	stx-bh-bl-sta-TERMINATE-sum-eot <- [KEY]
+			[Qcontroller]-> stx-bh-bl-sta-TERMINATE-Ack-sum-eot -> [KEY]
+
+		case VOTE:
+			[Qcontroller]<-	stx-bh-bl-sta-VOTE-sum-eot <- [KEY]
+			[Qcontroller]-> stx-bh-bl-sta-VOTE-Ack-sum-eot -> [KEY]
+
+		case TRANSFER_STA:
+			[Qcontroller]<-	stx-bh-bl-sta-TRANSFER_STA-Qtype-Qnum(3bytes)-sum-eot <- [KEY]
+			[Qcontroller]-> stx-bh-bl-sta-TRANSFER_STA-Ack-sum-eot -> [KEY]
+
+		case BREAK:
+			[Qcontroller]<-	stx-bh-bl-sta-BREAK-sum-eot <- [KEY]
+			[Qcontroller]-> stx-bh-bl-sta-BREAK-Ack-sum-eot -> [KEY]
+
+
 ================================================================================================

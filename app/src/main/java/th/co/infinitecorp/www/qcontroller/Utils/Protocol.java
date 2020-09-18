@@ -67,6 +67,10 @@ public class Protocol {
         final public static byte RECALL_DIV= 0x17;
         final public static byte REQUEST_CURRENT_STATUS=0x18;
         final public static byte CHECK_CONNECTION=0x19;
+
+        final public static byte CallReserveQ = (byte) 0xC0;
+        final public static byte RealTimeData = (byte) 0xD0;
+
     }
     /*2.DISPLAY*/
     public class DISPLAY_CMD {
@@ -86,9 +90,21 @@ public class Protocol {
     }
     /*5.QPRINT*/
     public class QPRINT_CMD {
+        final public static byte QUERY = 0x00;
+        final public static byte SETTICKET = 0x01;
+        final public static byte SETEXISTBUTTON = 0x05;
+        final public static byte QTICKET = 0x06;
+        final public static byte MAINTENANCE_REPORT=0x07;
+        final public static byte PING=010;
+    }
+    public class QPRINT_SUBCMD {
         final public static byte SYNC = 0x00;
-        final public static byte PRINT_QTICKET = 0x06;
-        final public static byte PRINT_MAINTENANCE_REPORT=0x07;
+        final public static byte PRINT_FlashButton=(byte) 0xF0;
+    }
+    public class QPRINT_RES_CODE {
+        final public static byte SUCCESS = 0x00;
+        final public static byte FAIL = 0x01;
+
     }
     /*6.QSOUND*/
     public class QSOUND_CMD {
@@ -99,6 +115,107 @@ public class Protocol {
     public class SCOREBOX_CMD {
         final public static byte SYNC = 0x00;
 
+    }
+    /*8.AllSoftkey*/
+    public class  Softkey_CMD{
+        final public static byte IDLE = (byte)0x00;
+        final public static byte TRNSC = (byte)0x01;
+        final public static byte DIRECT_CALL = (byte)0x02;
+        final public static byte CANCEL = (byte)0x03;
+        final public static byte TRANSFER = (byte)0x04;
+        final public static byte DIV = (byte)0x05;
+        final public static byte ACALL = (byte)0x06;
+        final public static byte PAUSE = (byte)0x07;
+        final public static byte HOLD = (byte)0x08;
+        final public static byte NEXT = (byte)0x09;
+        final public static byte RECALL = (byte)0x0A;
+        final public static byte CALLHOLD = (byte)0x0B;
+        final public static byte LOGON = (byte)0x0E;
+        final public static byte GROUP_CALL = (byte)0x0F;
+        final public static byte WALKDIRECT = (byte)0x10;
+        final public static byte ENDTRANS = (byte)0x11;
+        final public static byte CHANGEGROUP = (byte)0x12;
+        final public static byte SUBDIV = (byte)0x13;
+        final public static byte GetPullQ = (byte)0x14;
+
+        final public static byte STARTUP = (byte)0x2B;
+        final public static byte ADDDIV = (byte)0xAB;
+        final public static byte TERMINATE = (byte)0x2C;
+        final public static byte RESERVE = (byte)0xF0;
+        final public static byte TRANSFER_STA = (byte)0xF1;
+        final public static byte BREAK = (byte)0xFF;
+        final public static byte VOTE = (byte)0x50;
+        final public static byte CALLDIV = (byte)0x60;
+        final public static byte RECALLDIV = (byte)0x61;
+        final public static byte TRANSFER_To_Employee = (byte)0x22;
+        final public static byte TRANSFER_To_Station = (byte)0x23;
+        final public static byte TRANSFER_To_DIV = (byte)0x24;
+        final public static byte DirectCancel = (byte)0x25;
+    }
+    public class  Softkey_Update{
+        final public static byte IDLE = (byte)0x00;
+        final public static byte TRNSC = (byte)0x01;
+        final public static byte DIRECT_CALL = (byte)0x02;
+        final public static byte CANCEL = (byte)0x03;
+        final public static byte TRANSFER = (byte)0x04;
+        final public static byte DIV = (byte)0x05;
+        final public static byte ACALL = (byte)0x06;
+        final public static byte PAUSE = (byte)0x07;
+        final public static byte HOLD = (byte)0x08;
+        final public static byte NEXT = (byte)0x09;
+        final public static byte RECALL = (byte)0x0A;
+        final public static byte CALLHOLD = (byte)0x0B;
+        final public static byte LOGON = (byte)0x0E;
+        final public static byte GROUP_CALL = (byte)0x0F;
+        final public static byte WALKDIRECT = (byte)0x10;
+        final public static byte ENDTRANS = (byte)0x11;
+        final public static byte CHANGEGROUP = (byte)0x12;
+        final public static byte SUBDIV = (byte)0x13;
+        final public static byte GetPullQ = (byte)0x14;
+
+        final public static byte STARTUP = (byte)0x2B;
+        final public static byte ADDDIV = (byte)0xAB;
+        final public static byte TERMINATE = (byte)0x2C;
+        final public static byte RESERVE = (byte)0xF0;
+        final public static byte TRANSFER_STA = (byte)0xF1;
+        final public static byte BREAK = (byte)0xFF;
+        final public static byte VOTE = (byte)0x50;
+        final public static byte CALLDIV = (byte)0x60;
+        final public static byte RECALLDIV = (byte)0x61;
+        final public static byte TRANSFER_To_Employee = (byte)0x22;
+        final public static byte TRANSFER_To_Station = (byte)0x23;
+        final public static byte TRANSFER_To_DIV = (byte)0x24;
+        final public static byte DirectCancel = (byte)0x25;
+    }
+    public class  Softkey_STARTUP_SUBCMD {
+        final public static byte groupinfo = (byte)0x00;
+        final public static byte divinfo = (byte)0x01;
+        final public static byte breakinfo = (byte)0x02;
+        final public static byte divList = (byte)0x03;
+        final public static byte holdreasoninfo = (byte)0x04;
+        final public static byte userSettingInfo = (byte)0x05;
+        final public static byte reserveQ   = (byte)0x06;
+        final public static byte counterinfo = (byte)0x07;
+        final public static byte notRequest = (byte)0xff;
+    }
+    public class  Softkey_UPDATEDATA_CMD {
+        final public static byte STATUS_DIV = (byte)0xCC;
+        final public static byte STATUS_INFO = (byte)0xCD;
+        final public static byte DIVISION_INFO = (byte)0xD1;
+        final public static byte GROUP_INFO = (byte)0xD2;
+        final public static byte BREAK_INFO = (byte)0xD3;
+        final public static byte SCOREKEY_PRESS = (byte)0xC1;
+        final public static byte GROUP_ID = (byte)0xC2;
+        final public static byte LOGIN_INFO = (byte)0xC3;
+        final public static byte STATION_WAIT = (byte)0xC5;
+        final public static byte HOLD_LIST = (byte)0xC6;
+        final public static byte RESERVEQ = (byte)0xF4;
+        final public static byte NEXT_QUEUE = (byte)0xF7;
+        final public static byte STATION_RESERVE = (byte)0xF8;
+        final public static byte PAPER_INFO = (byte)0xF9;
+        final public static byte CurrentQ_INFO = (byte)0xFA;
+        final public static byte QWAIT_BY_DIV = (byte)0xFB;
+        final public static byte COUNTER_STATUS_INFO = (byte)0xFC;
     }
 
     /*Uart Address*/
@@ -132,6 +249,9 @@ public class Protocol {
         return (short) ((bh<<8)|(bl));
     }
     public static byte CheckSum(byte[] bytes) {
+
+        if(bytes==null) return 0x00;
+
         byte sum=0x00;
         for(int i=1;i< (bytes.length-2);i++)
         {
@@ -140,6 +260,8 @@ public class Protocol {
         return sum;
     }
     public static boolean Verify_Sum(byte[] bytes,byte checkSum) {
+        if(bytes==null) return false;
+
         byte sum=0x00;
         for(int i=1;i< (bytes.length-2);i++) {
             sum^=bytes[i];
@@ -151,6 +273,8 @@ public class Protocol {
         }
     }
     public static boolean Verify_DataFrame(byte[] bytes) {
+
+        if(bytes==null) return false;
 
         byte stx=bytes[0];
         byte eot=bytes[bytes.length-1];
@@ -168,6 +292,9 @@ public class Protocol {
         }
     }
     public static byte Verifed_DataFrame(byte[] bytes) {
+
+        if(bytes==null)
+            return  FRAME_STATUS.TIMEOUT;
 
         if(bytes.length==0)
             return  FRAME_STATUS.TIMEOUT;
@@ -209,8 +336,10 @@ public class Protocol {
         sBytes[idx++]=0x00;
         sBytes[idx++]=cmd;
 
-        for(int i=0;i<bytes.length;i++) {
-            sBytes[idx++] = (byte) bytes[i];
+        if(bytes!=null) {
+            for (int i = 0; i < bytes.length; i++) {
+                sBytes[idx++] = (byte) bytes[i];
+            }
         }
 
         sBytes[2]=(byte) ((idx-4)>>8);
@@ -253,7 +382,8 @@ public class Protocol {
 
         if(bytes!=null) {
             for (int i = 0; i < bytes.length; i++) {
-                sBytes[idx++] = (byte) bytes[i];
+                int d=(bytes[i]&0xFF);
+                sBytes[idx++] = (byte) d;
             }
         }
 
@@ -285,8 +415,10 @@ public class Protocol {
         sBytes[idx++]=deviceType;
         sBytes[idx++]=deviceId;
 
-        for(int i=0;i<bytes.length;i++) {
-            sBytes[idx++] = (byte) bytes[i];
+        if(bytes!=null) {
+            for (int i = 0; i < bytes.length; i++) {
+                sBytes[idx++] = (byte) bytes[i];
+            }
         }
 
         sBytes[1]=(byte) (((idx-5)>>24)&0xff);
@@ -305,11 +437,96 @@ public class Protocol {
         byte[] b = Arrays.copyOf(sBytes, idx);
         return b;
     }
-    public static byte[] Answer_Protocol_V2(byte cmd,byte frameId,byte deviceType,byte deviceId,byte ans)
-    {
-        //byte[] bytes=new byte[1024*2];
-        //int idx=0;
-        //byte[] b = Arrays.copyOf(bytes, idx);
+    public static byte[] PrepareData_Protocol_V4(byte cmd,byte deviceId,byte[] bytes){
+        byte[] sBytes=new byte[1024*10];
+        int idx=0;
+
+        sBytes[idx++]=Protocol.STX;
+        sBytes[idx++]=0x00;
+        sBytes[idx++]=0x00;
+        sBytes[idx++]=deviceId;
+        sBytes[idx++]=cmd;
+
+        if(bytes!=null) {
+            for (int i = 0; i < bytes.length; i++) {
+                sBytes[idx++] = (byte) bytes[i];
+            }
+        }
+
+        sBytes[1]=(byte) ((idx-3)>>8);
+        sBytes[2]=(byte) ((idx-3)&0xff);
+
+        byte sum=0x00;
+        for(int i=1;i<idx;i++)
+        {
+            sum^=sBytes[i];
+        }
+        sBytes[idx++]=sum;
+        sBytes[idx++]=Protocol.EOT;
+
+        byte[] b = Arrays.copyOf(sBytes, idx);
+        return b;
+    }
+    public static byte[] PrepareData_Protocol_V5(byte cmd,byte[] bytes){
+        byte[] sBytes=new byte[1024*10];
+        int idx=0;
+
+        sBytes[idx++]=Protocol.STX;
+        sBytes[idx++]=0x00;
+        sBytes[idx++]=0x00;
+        sBytes[idx++]=(byte) cmd;
+
+        if(bytes!=null) {
+            for (int i = 0; i < bytes.length; i++) {
+                sBytes[idx++] = (byte) bytes[i];
+            }
+        }
+
+        sBytes[1]=(byte) ((idx-3)>>8);
+        sBytes[2]=(byte) ((idx-3)&0xff);
+
+        byte sum=0x00;
+        for(int i=1;i<idx;i++)
+        {
+            sum^=sBytes[i];
+        }
+        sBytes[idx++]=(byte) sum;
+        sBytes[idx++]=Protocol.EOT;
+
+        byte[] b = Arrays.copyOf(sBytes, idx);
+        return b;
+    }
+    public static byte[] PrepareData_Protocol_V6(byte cmd,byte deviceId,byte[] bytes){
+        byte[] sBytes=new byte[1024*10];
+        int idx=0;
+
+        sBytes[idx++]=Protocol.STX;
+        sBytes[idx++]=0x00;
+        sBytes[idx++]=0x00;
+        sBytes[idx++]=(byte) cmd;
+        sBytes[idx++]=(byte)deviceId;
+        if(bytes!=null) {
+            for (int i = 0; i < bytes.length; i++) {
+                sBytes[idx++] = (byte) bytes[i];
+            }
+        }
+
+        sBytes[1]=(byte) ((idx-3)>>8);
+        sBytes[2]=(byte) ((idx-3)&0xff);
+
+        byte sum=0x00;
+        for(int i=1;i<idx;i++)
+        {
+            sum^=sBytes[i];
+        }
+        sBytes[idx++]=(byte) sum;
+        sBytes[idx++]=Protocol.EOT;
+
+        byte[] b = Arrays.copyOf(sBytes, idx);
+        return b;
+    }
+    public static byte[] Answer_Protocol_V2(byte cmd,byte frameId,byte deviceType,byte deviceId,byte ans) {
+
         return Protocol.prepareData_Protocol_V2(cmd,frameId,deviceType,deviceId,ans, RESPONSE_STATUS.SUCCESS,null);
     }
 

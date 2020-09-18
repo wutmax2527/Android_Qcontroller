@@ -30,7 +30,7 @@ public class QueueInfo {
     byte staOpen;
     public QueueInfo()
     {
-
+        queueNo="";
     }
 
     public String getReqDateTime() {

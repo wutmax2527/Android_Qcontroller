@@ -44,16 +44,17 @@
                 android:background="@color/colorPrimary"
                 android:layout_margin="15dp"
                 />
+
             <Button
+                android:id="@+id/btn_id3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/btn_id3"
-                android:text="ประเภทบริการ 3"
-                android:textSize="@dimen/text_Service_margin"
-                android:textColor="@color/White"
-                android:background="@color/colorPrimary"
                 android:layout_margin="15dp"
-                />
+                android:background="@color/colorPrimary"
+                android:text="ประเภทบริการ 3"
+                android:textColor="@color/White"
+                android:textSize="@dimen/text_Service_margin" />
+
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

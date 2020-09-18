@@ -54,6 +54,7 @@ public class QcontrollerApi {
         });
         Log.d("debug_URL","URL="+call.request().url().toString());
     }
+
     //DivInfo
     public interface DivInfoDetailListener {
         void onDivInfoResult(List<DivInfo> info, Integer http_code);

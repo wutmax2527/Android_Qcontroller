@@ -55,12 +55,5 @@ public class RealtimeService extends Service {
             }
         }
     });
-    public static void AddToList(QDisplayInfo qDisplayInfo)
-    {
-        GData.qDisplayInfos.add(qDisplayInfo);
-    }
-    public static void ClearList()
-    {
-        GData.qDisplayInfos.clear();
-    }
+
 }

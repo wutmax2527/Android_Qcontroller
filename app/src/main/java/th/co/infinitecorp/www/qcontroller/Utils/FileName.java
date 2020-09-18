@@ -4,7 +4,7 @@ public  class FileName {
 
     public static String SampleFile_TXT= "SampleFile.txt";
 
-    //Profile Info
+    //---Profile Info
     public static String BranchInfo_JSON = "BranchInfo.json";
     public static String DivInfo_JSON = "DivInfo.json";
     public static String  LangDivInfo_JSON = "LangDivInfo.json";
@@ -21,8 +21,13 @@ public  class FileName {
     public static String PF_OTHER_JSON = "PF_OTHER.json";
     public static String PF_ALARMGROUP_JSON = "PF_ALARMGROUP.json";
     public static String PF_AUTOTRANSFER_JSON = "PF_AUTOTRANSFER.json";
+    //---Mapping Info
+    public static String StaMapGroupInfo_JSON = "StaMapGroupInfo.json";
+    public static String DivMapGroupInfo_JSON = "DivMapGroupInfo.json";
 
-    //CurrentLogInfo
+    public static String QClientWebStationSetting_JSON = "QClientWebStationSetting.json";
+
+    //---CurrentLogInfo
     public static String BranchStatus_JSON="branchStatus.json";
     public static String Division_JSON="division.json";
     public static String QLaunchingInfo_JSON="QLaunchingInfo.json";
@@ -36,8 +41,9 @@ public  class FileName {
     public static String CurrentStationInfo_JSON="CurrentStationInfo.json";
     public static String CurrentDivisionInfo_JSON="CurrentDivisionInfo.json";
     public static String CurrentGroupInfo_JSON="CurrentGroupInfo.json";
+    public static String PeriperalInfo_JSON="PeriperalInfo.json";
 
-    //Log info for Send Server
+    //---Log info for Send Server
     public static String Allqueue_bin="allqueue.bin";
     public static String Current_breaking_tbl="current_breaking.tbl";
     public static String Current_userlog_tbl="current_userlog.tbl";

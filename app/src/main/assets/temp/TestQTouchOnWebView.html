@@ -1,0 +1,25 @@
+<html>
+<body>
+<center>
+<h3>WebView</h3>
+<input type="text" id="textBox" ></br>
+<button onclick="showMessage()">Show Message1</button> 
+<input type="button" value="Show Message2" onClick="someMethodOnAndroid()" />
+<button onclick="someMethodOnAndroid()">Show Message3</button> 
+</center>
+<script>
+        
+        function setTextField(text) {
+                var text = text;               
+                document.getElementById("textBox").value = text;
+        }
+        
+        function showMessage() {
+                Android.showToast();
+        } 
+        function someMethodOnAndroid() {
+               Android.someMethodOnAndroid('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');
+        }		
+</script>
+</body>
+</html>

@@ -29,5 +29,7 @@
     <string name="title_activity_touch_screen_style2_webview_fullscreen">
         TouchScreenStyle2WebviewFullscreenActivity
     </string>
-
+    <string name="checkNetwork"> check Network</string>
+    <string name="ok"> ok</string>
+    <string name="exit"> Exit</string>
 </resources>

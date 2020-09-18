@@ -10,6 +10,9 @@ public class SoundInfo {
             EN_noi,
             TH_aom,
             TH_pk,
+            bell_Custom,
+            TH_Custom,
+            EN_Custom,
         }
         public enum WhoType{
             sound_Bell,
@@ -18,6 +21,9 @@ public class SoundInfo {
             sound_TH_aom,
             sound_TH_pk,
             sound_JP,
+            sound_Bell_Custom,
+            sound_TH_Custom,
+            sound_EN_Custom,
         }
 
         public enum Conjuction{

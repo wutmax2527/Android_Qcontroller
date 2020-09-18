@@ -4,16 +4,24 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.lang.reflect.Array;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+
+import th.co.infinitecorp.www.qcontroller.EventBus.DebugMessageEvent;
 
 public class TCPServer implements TCPServerService {
     private static final String TAG = TCPServer.class.getSimpleName();
@@ -30,7 +38,9 @@ public class TCPServer implements TCPServerService {
         this.dataReceivedListener = listener;
     }
     public interface OnDataReceivedListener {
-        void onDataReceived(Socket socket,String message, String ip,byte[] bytes);
+        void onConnect(Socket socket,String ip);
+        void onDataReceived(Socket socket,String ip, String message,byte[] bytes);
+        void onDisconnect(Socket socket,String ip);
     }
     @Override
     public OnDataReceivedListener getDataReceivedListener() {
@@ -63,9 +73,7 @@ public class TCPServer implements TCPServerService {
 
     }
 
-
-    public TCPServer(int listenerPort)
-    {
+    public TCPServer(int listenerPort) {
         this.listenerPort=listenerPort;
         updateConversationHandler = new Handler();
         this.serverThread = new Thread(new ServerThread(listenerPort,this));
@@ -99,7 +107,14 @@ public class TCPServer implements TCPServerService {
             }
         }
     }
-
+    protected void Sleep() {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            //e.printStackTrace();
+            Thread.currentThread().interrupt();
+        }
+    }
     class CommunicationThread implements Runnable {
 
         private Socket clientSocket;
@@ -110,42 +125,63 @@ public class TCPServer implements TCPServerService {
             this.clientSocket = clientSocket;
             this.tcpServerService=tcpServerService;
             try {
-                this.input = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
+                this.input = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream(), StandardCharsets.UTF_8));
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
 
         public void run() {
+            //EventBus.getDefault().post(new DebugMessageEvent("****Connect****"));
+            /*Socket is Connect*/
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                public void run() {
+                    tcpServerService.getDataReceivedListener().onConnect(clientSocket, clientSocket.getInetAddress().getHostAddress());
+                }
+            });
             while (!Thread.currentThread().isInterrupted()) {
                 try {
-                    final String incomingMsg;
-                    int charsRead = 0;
-                    char[] buffer = new char[2024];
-                    charsRead =input.read(buffer);
-                    if(charsRead>0) {
-                        incomingMsg = new String(buffer).substring(0, charsRead);
-                        byte[] bytes= incomingMsg.getBytes();
-                        Log.w(TAG, "incomingMsg=" + incomingMsg);
-                        final String ip=clientSocket.getInetAddress().getHostAddress();
-                        updateConversationHandler.post(new updateUIThread(" ip="+ip+" size="+bytes.length+"  data="+incomingMsg));
-                        final Socket socket=clientSocket;
-                        final  byte[] rBuf=bytes;
-                        if (tcpServerService.getDataReceivedListener() != null && incomingMsg.length() > 0) {
-                            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                                public void run() {
-                                    tcpServerService.getDataReceivedListener().onDataReceived(socket, ip,incomingMsg, rBuf);
-                                }
-                            });
-                        }
+                    final String incomingMsg="";
+                    if(input.ready()) {
+                        InputStream inputStream  = this.clientSocket.getInputStream();
+                        byte[] bytes = new byte[inputStream.available()];
+                        int len = 0;
+                        len=inputStream.read(bytes);
+                        if (len > 0) {
+                            final byte[] rBuf = bytes;
+                            final String ip = clientSocket.getInetAddress().getHostAddress();
+                            final Socket socket = clientSocket;
 
-                    }else {
-                        Thread.currentThread().interrupt();
+                            if (tcpServerService.getDataReceivedListener() != null) {
+                                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                    public void run() {
+                                        tcpServerService.getDataReceivedListener().onDataReceived(socket, ip, incomingMsg, rBuf);
+                                    }
+                                });
+                            }
+                        } else {
+                            Thread.currentThread().interrupt();
+                        }
                     }
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    //e.printStackTrace();
+                    Thread.currentThread().interrupt();
+                }
             }
+            /*Socket is disconnect*/
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                public void run() {
+                    tcpServerService.getDataReceivedListener().onDisconnect(clientSocket, clientSocket.getInetAddress().getHostAddress());
+                }
+            });
+
         }
     }
     class updateUIThread implements Runnable {
@@ -161,16 +197,14 @@ public class TCPServer implements TCPServerService {
 
         }
     }
-    public void Send(Socket socket,String message)
-    {
+    public void Send(Socket socket,String message) {
         try {
             BufferedWriter out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             out.write(message);
             out.flush();
         }catch (Exception e){}
     }
-    public void Send(Socket socket,byte[] bytes)
-    {
+    public void Send(Socket socket,byte[] bytes) {
         try {
             OutputStream outputStream=socket.getOutputStream();
             outputStream.write(bytes);
@@ -180,4 +214,50 @@ public class TCPServer implements TCPServerService {
 
         }catch (Exception e){}
     }
+    /*
+    public void SendReceive(final Socket socket,byte[] bytes) {
+        Send(socket,bytes);
+        try {
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
+            while (socket!=null) {
+                try {
+                    final String incomingMsg="";
+                    if(bufferedReader.ready()) {
+                        InputStream inputStream  = socket.getInputStream();
+                        byte[] bytes = new byte[inputStream.available()];
+                        int len = 0;
+                        len=inputStream.read(bytes);
+                        if (len > 0) {
+                            final byte[] rBuf = bytes;
+                            final String ip = socket.getInetAddress().getHostAddress();
+
+                            if (this.tcpServerService.getDataReceivedListener() != null) {
+                                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                    public void run() {
+                                        tcpServerService.getDataReceivedListener().onDataReceived(socket, ip, incomingMsg, rBuf);
+                                    }
+                                });
+                            }
+                        } else {
+                            Thread.currentThread().interrupt();
+                        }
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    //e.printStackTrace();
+                    Thread.currentThread().interrupt();
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+    */
 }

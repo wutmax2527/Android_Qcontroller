@@ -32,9 +32,18 @@ public class SystemMgr {
         GData.CurGrp=LogMgr.Load_CurrentGroupInfo(context);
         InitializeMgr.Init_CurrentData(context);
 
+        LogMgr.Delete_PeriperalInfo(context);
+        GData.PeriperalInfos=LogMgr.Load_PeriperalInfo(context);
+        InitializeMgr.Init_HardwareData(context);
+
+        LogMgr.Delete_StationSetting(context);
+
         ViewLogMgr.ShowQueue();
         ViewLogMgr.ShowUserlog();
         ViewLogMgr.ShowCounterlog();
+        ViewLogMgr.ShowPeriperal();
+        ViewLogMgr.ShowStaMapGroup();
+        ViewLogMgr.ShowDivMapGroup();
         return res;
     }
     public static boolean Reset_Queue(Context context) {
@@ -53,7 +62,9 @@ public class SystemMgr {
                 GData.Division.set(divisionInfo.getId() - 1, divisionInfo);
             }
         }
+        QueueMgr.UpdateQueueStatChange();
         EventBus.getDefault().post(new DebugMessageEvent("***Reset Queue***"));
+
         return true;
     }
     public static boolean CheckResetQueue(Context context) {

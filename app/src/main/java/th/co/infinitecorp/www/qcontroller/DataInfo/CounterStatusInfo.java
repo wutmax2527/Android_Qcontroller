@@ -1,5 +1,9 @@
 package th.co.infinitecorp.www.qcontroller.DataInfo;
 
+import java.util.List;
+
+import th.co.infinitecorp.www.qcontroller.DataInfo.Mapping.DivMapGroupInfo;
+
 public class CounterStatusInfo {
     byte group_id;
     byte counterStatus;
@@ -9,6 +13,7 @@ public class CounterStatusInfo {
     short holdQ;
     String groupName;
     String nameUser;
+
 
     public CounterStatusInfo() {
     }
@@ -86,4 +91,6 @@ public class CounterStatusInfo {
     public void setNameUser(String nameUser) {
         this.nameUser = nameUser;
     }
+
+
 }

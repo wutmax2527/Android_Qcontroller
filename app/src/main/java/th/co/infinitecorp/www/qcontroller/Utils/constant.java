@@ -4,5 +4,7 @@ public class constant {
     final public static   Integer nDiv =  200;
     final public static   Integer nGroup = 48;
     final public static   Integer nStation = 48;
+    final public static   Integer nLedDisplay = 255;
+
 
 }

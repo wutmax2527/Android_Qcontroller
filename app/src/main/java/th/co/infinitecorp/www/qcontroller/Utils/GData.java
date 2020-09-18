@@ -28,17 +28,24 @@ import th.co.infinitecorp.www.qcontroller.DataInfo.MASTER.PF_OTHER;
 import th.co.infinitecorp.www.qcontroller.DataInfo.MASTER.PF_STAMAP;
 import th.co.infinitecorp.www.qcontroller.DataInfo.MASTER.StaInfo;
 import th.co.infinitecorp.www.qcontroller.DataInfo.MASTER.UserInfo;
+import th.co.infinitecorp.www.qcontroller.DataInfo.Mapping.DivMapGroupInfo;
+import th.co.infinitecorp.www.qcontroller.DataInfo.Mapping.StaMapGroupInfo;
+import th.co.infinitecorp.www.qcontroller.DataInfo.PeriperalInfo;
 import th.co.infinitecorp.www.qcontroller.DataInfo.QSoundInfo;
 import th.co.infinitecorp.www.qcontroller.DataInfo.QTicketInfo;
 import th.co.infinitecorp.www.qcontroller.DataInfo.ServiceInfo.DisplayInfo;
 import th.co.infinitecorp.www.qcontroller.DataInfo.ServiceInfo.PlaylistInfo;
 import th.co.infinitecorp.www.qcontroller.DataInfo.ServiceInfo.QDisplayInfo;
+import th.co.infinitecorp.www.qcontroller.DataInfo.StationReserveInfo;
+import th.co.infinitecorp.www.qcontroller.DataInfo.TcpSocketInfo;
 
 public class GData {
 
     public static Integer SERVE_ID=0;
-    public static Integer Branch_ID=99999;
-    public static String TARGET_SERVER="10.172.100.51";
+    public static Integer Branch_ID=99997;
+    public static String TARGET_SERVER="10.172.100.107";//"10.172.100.51";
+
+    public static boolean IsShowThredRun=false;
 
     /*Profile Info*/
     public static List<BranchInfo> branchInfos;
@@ -57,6 +64,10 @@ public class GData {
     public static List<PF_STAMAP> pf_stamaps;
     public static List<PF_ALARMGROUP> pf_alarmgroups;
 
+    /*Mapping Info*/
+    public static List<StaMapGroupInfo> StaMapGroupInfos;
+    public static List<DivMapGroupInfo> DivMapGroupInfos;
+
     /*Current Log Info*/
     public static List<BranchStatusInfo> branchStatusInfos;
     public static List<DivisionInfo> Division;
@@ -65,7 +76,8 @@ public class GData {
     public static List<QueuelogInfo> Queuelog;
     public static List<UserlogInfo> Userlog;
     public static List<CounterlogInfo> Counterlog;
-
+    public static List<PeriperalInfo> PeriperalInfos=new ArrayList<>();
+    public static List<TcpSocketInfo> TcpSocketInfos=new ArrayList<>();
     public static List<CurrentDivisionInfo> CurDiv;
     public static List<CurrentGroupInfo> CurGrp;
     public static List<CurrentStationInfo> CurStation;
@@ -82,6 +94,9 @@ public class GData {
     public static Integer callAPI_Index=0;
     public static boolean initialFinished=false;
 
-    //Uart Q-Print&QSound
+    /*Uart Q-Print&QSound*/
     public static QTicketInfo qTicketInfo=new QTicketInfo();
+
+    /*Reserve Counter fo Calling Q*/
+    public static List<StationReserveInfo> stationReserveInfos=new ArrayList<>();
 }

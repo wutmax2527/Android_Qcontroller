@@ -36,7 +36,6 @@ public class DisplayService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -50,8 +49,7 @@ public class DisplayService extends Service {
         public void run() {
             Integer runIndex=0;
             Integer ProcessIndex=0;
-            while (true)
-            {
+            while (true) {
                 try {
                     Thread.sleep(200);
                 } catch (InterruptedException e) {
@@ -76,7 +74,7 @@ public class DisplayService extends Service {
                     tcpClient_DISPLAY.setOnDataReceivedListener(new TCPClient.OnDataReceivedListener() {
                         @Override
                         public void onDataReceived(Socket socket, String message,byte[] rBytes) {
-                            EventBus.getDefault().post(new DebugMessageEvent("tcpClient_DISPLAY Rev data="+message+" len="+rBytes.length));
+                            EventBus.getDefault().post(new DebugMessageEvent("tcpClient_DISPLAY Rev len="+rBytes.length));
                             if(tcpClient_DISPLAY.getSocket()==socket)
                             {
                                 EventBus.getDefault().post(new DebugMessageEvent("tcpClient_DISPLAY Remove List"));
@@ -117,7 +115,7 @@ public class DisplayService extends Service {
     private static DisplayInfo NEW_QueueOnDisplay() {
         DisplayInfo d=new DisplayInfo();
         d.setId((byte) 0x00);
-        d.setIp("10.172.102.136");
+        d.setIp("10.172.103.117");
         d.setqStart(new QInfo());
         d.setqEnd(new QInfo());
         d.setStation_id((byte) 0);
@@ -145,12 +143,12 @@ public class DisplayService extends Service {
         QInfo qStart=d.getqStart();
         QInfo qEnd=d.getqEnd();
         /*Data*/
-        //Queue Start
+        //---Queue Start
         bytes[idx++] = qStart.getqType();
         bytes[idx++] = qStart.getqAlp();
         bytes[idx++] = Convert.GetByteHigh(qStart.getqNum());
         bytes[idx++] = Convert.GetByteLow(qStart.getqNum());
-        //Queue Start
+        //---Queue Start
         bytes[idx++] = qEnd.getqType();
         bytes[idx++] = qEnd.getqAlp();
         bytes[idx++] = Convert.GetByteHigh(qEnd.getqNum());
@@ -163,7 +161,7 @@ public class DisplayService extends Service {
         bytes[idx++]=d.getnBlink();
         bytes[idx++]=d.getSoundType();
         byte[] b = Arrays.copyOf(bytes, idx);
-        byte[] sBytes=prepareDataForSend(Protocol.DISPLAY_CMD.SHOW_Q, (byte)0x00,Protocol.DeviceType.DISPLAY,deviceId,b);
+        byte[] sBytes=prepareDataForSend(Protocol.DISPLAY_CMD.SHOW_Q, Protocol.FrameID.ID1,Protocol.DeviceType.DISPLAY,deviceId,b);
         return sBytes;
     }
     private byte[] prepareDataForSend(byte cmd,byte frameId,byte deviceType,byte deviceId,byte[] bytes) {

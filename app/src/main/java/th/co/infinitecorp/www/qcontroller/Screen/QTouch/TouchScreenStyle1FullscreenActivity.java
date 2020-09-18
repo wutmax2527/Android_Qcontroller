@@ -116,7 +116,7 @@ public class TouchScreenStyle1FullscreenActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 QTouchService qTouchService=new QTouchService(getApplicationContext());
-                qTouchService.Call_REQUEST_QUEUE((byte) 1);;
+                qTouchService.Call_REQUEST_QUEUE((byte) 1);
             }
         });
         Button btn_id2=(Button)findViewById(R.id.btn_id2);

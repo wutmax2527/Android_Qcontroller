@@ -7,15 +7,13 @@ import java.util.Date;
 import th.co.infinitecorp.www.qcontroller.DataInfo.DateTimeInfo;
 
 public class DateTime {
-    public static String GetDateTimeNow()
-    {
+    public static String GetDateTimeNow() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String strDateTime = sdf.format(new Date());
 
         return strDateTime;
     }
-    public static String GetCurrentDateTime(String pattern)
-    {
+    public static String GetCurrentDateTime(String pattern) {
         Date currentTime = Calendar.getInstance().getTime();
         //SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         SimpleDateFormat format = new SimpleDateFormat(pattern);
