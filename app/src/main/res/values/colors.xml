@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="White">#FFFFFF</color>
+    <color name="Silver">#C0C0C0</color>
+    <color name="Gray">#808080</color>
+    <color name="Black">#000000</color>
+    <color name="BlueGray">#98AFC7</color>
+    <color name="Platinum">#E5E4E2</color>
+
+    <color name="black_overlay">#66000000</color>
+
+</resources>

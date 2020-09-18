@@ -1,0 +1,229 @@
+================================================================================================
+Protocol(QControler)
+================================================================================================
+STX=0x02,EOT=0x04,ACK=0x06,NACK=0x15,NONE=0x00;STATUS=>{0=PASS}
+================================================================================================
+DeviceType:
+0.NONE
+1.HW_KEYPAD
+2.DISPLAY
+3.QTOUCH
+4.QDISPLAY
+5.QPRINT
+6.QSOUND
+7.SCOREBOX
+9.SW_KEYPAD
+================================================================================================
+1.KEYPAD_WIFI(QControler Listen_TCP_PORT 20002):
+Format:
+     KEY->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-FVer[4]-HVer[4]-NONE-STATUS-DATA-SUM-EOT
+  Server->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-SVer[4]-HVer[4]-NONE-STATUS-DATA-SUM-EOT
+KEY(Ack)->STX-LEN[2]-CMD-FrameID3-DeviceType-DeviceID-FVer[4]-HVer[4]-ACK-STATUS-DATA-SUM-EOT
+                 ......
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Remark:
+1.QNo[4]=QType-Alp-QBh-QBl
+2.STATUS=>{0=PASS/SUCCESS,1=Miss match/Fail}
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+[SYNC=0x00]
+     KEY->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-FVer[4]-HVer[4]-NONE-STATUS-STA-SUM-EOT
+  Server->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-SVer[4]-HVer[4]-ACK-STATUS-SUM-CounterStatus-userID[4]-GrpID-WQ[2]-HQ[2]-QNo[4]-QStatus-Div-len[2]+(Unicode){UserID+"|"NameUser+"|"+GrpID+"|"+GrpName}-EOT
+------------------------------------------------------------------------------------------------
+[STARTUP=0x01]
+     KEY->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-FVer[4]-HVer[4]-NONE-STATUS-STA-SUM-EOT
+  Server->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-SVer[4]-HVer[4]-ACK-STATUS-SUM-EOT
+------------------------------------------------------------------------------------------------
+[LOGIN=0x02]
+     KEY->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-FVer[4]-HVer[4]-NONE-STATUS-STA-len[2]+(Ascii){USERCODE+"|"+Username+"|"+Password}-SUM-EOT
+  Server->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-SVer[4]-HVer[4]-ACK-STATUS-STA-len[2]+(Unicode){UserID+"|"NameUser}-SUM-EOT
+------------------------------------------------------------------------------------------------
+[LOGOUT=0x03]
+     KEY->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-FVer[4]-HVer[4]-NONE-STATUS-STA-SUM-EOT
+  Server->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-SVer[4]-HVer[4]-ACK-STATUS-SUM-EOT
+------------------------------------------------------------------------------------------------
+[BREAK=0x04]
+     KEY->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-FVer[4]-HVer[4]-NONE-STATUS-STA-len[2]+(Unicode){ReasonCode+"|"+ReasonDetail}SUM-EOT
+  Server->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-SVer[4]-HVer[4]-ACK-STATUS-STA-SUM-EOT
+------------------------------------------------------------------------------------------------
+[NEXT=0x05]
+     KEY->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-FVer[4]-HVer[4]-NONE-STATUS-STA-SUM-EOT
+  Server->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-SVer[4]-HVer[4]-ACK-STATUS-STA-QNo[4]-SUM-EOT
+KEY(Ack)->STX-LEN[2]-CMD-FrameID3-DeviceType-DeviceID-FVer[4]-HVer[4]-ACK-STATUS-STA-QNo[4]-SUM-EOT
+------------------------------------------------------------------------------------------------
+[RECALL=0x06]
+     KEY->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-FVer[4]-HVer[4]-NONE-STATUS-STA-QStart[4]-QEnd[4]-SUM-EOT
+  Server->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-SVer[4]-HVer[4]-ACK-STATUS-STA-QStart[4]-QEnd[4]-SUM-EOT
+------------------------------------------------------------------------------------------------
+[DIRECT_CALL=0x07]
+     KEY->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-FVer[4]-HVer[4]-NONE-STATUS-STA-QNo[4]-SUM-EOT
+  Server->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-SVer[4]-HVer[4]-ACK-STATUS-STA-QNo[4]-SUM-EOT
+------------------------------------------------------------------------------------------------
+[TRANSACTION=0x08]
+     KEY->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-FVer[4]-HVer[4]-NONE-STATUS-STA-QNo[4]-SUM-EOT
+  Server->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-SVer[4]-HVer[4]-ACK-STATUS-STA-QNo[4]-SUM-EOT
+------------------------------------------------------------------------------------------------
+[CANCEL=0x09]
+     KEY->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-FVer[4]-HVer[4]-NONE-STATUS-STA-QNo[4]-SUM-EOT
+  Server->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-SVer[4]-HVer[4]-ACK-STATUS-STA-QNo[4]-SUM-EOT
+------------------------------------------------------------------------------------------------
+[TRANSFER=0x0A]
+     KEY->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-FVer[4]-HVer[4]-NONE-STATUS-STA-QNo[4]-TYPE_TRANSFER-Target-Transfer_Status-SUM-EOT
+  Server->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-SVer[4]-HVer[4]-ACK-STATUS-STA-QNo[4]-SUM-EOT
+  Remark:
+  1.TYPE_TRANSFER={0=DIV,1=STA,2=Employee}
+  2.Transfer_Status={0=RealTimeOfQ,1=NextQ,2=GoBack}
+------------------------------------------------------------------------------------------------
+[HELP=0x0B]
+     KEY->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-FVer[4]-HVer[4]-NONE-STATUS-STA-QNo[4]-len[2]+(Unicode){ReasonCode+"|"+ReasonDetail}-SUM-EOT
+  Server->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-SVer[4]-HVer[4]-ACK-STATUS-STA-QNo[4]-SUM-EOT
+------------------------------------------------------------------------------------------------
+[HOLD=0x0C]
+     KEY->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-FVer[4]-HVer[4]-NONE-STATUS-STA-QNo[4]-SUM-EOT
+  Server->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-SVer[4]-HVer[4]-ACK-STATUS-STA-QNo[4]-SUM-EOT
+------------------------------------------------------------------------------------------------
+[CALLHOLD=0x0D]
+     KEY->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-FVer[4]-HVer[4]-NONE-STATUS-STA-SUM-EOT
+  Server->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-SVer[4]-HVer[4]-ACK-STATUS-STA-QNo[4]-SUM-EOT
+KEY(Ack)->STX-LEN[2]-CMD-FrameID3-DeviceType-DeviceID-FVer[4]-HVer[4]-ACK-STATUS-STA-QNo[4]-SUM-EOT
+------------------------------------------------------------------------------------------------
+[SPAN_CALL=0x0E]
+     KEY->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-FVer[4]-HVer[4]-NONE-STATUS-STA-QStart[4]-QEnd[4]-SUM-EOT
+  Server->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-SVer[4]-HVer[4]-ACK-STATUS-STA-QStart[4]-QEnd[4]-SUM-EOT
+------------------------------------------------------------------------------------------------
+[WALKDIRECT=0x0F]
+     KEY->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-FVer[4]-HVer[4]-NONE-STATUS-STA-DIV-SUM-EOT
+  Server->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-SVer[4]-HVer[4]-ACK-STATUS-STA-QNo[4]-SUM-EOT
+------------------------------------------------------------------------------------------------
+[ENDTRANS=0x10]
+      KEY->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-FVer[4]-HVer[4]-NONE-STATUS-STA-QNo[4]-SUM-EOT
+   Server->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-SVer[4]-HVer[4]-ACK-STATUS-STA-QNo[4]-SUM-EOT
+------------------------------------------------------------------------------------------------
+[CHANGEGROUP=0x11]
+      KEY->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-FVer[4]-HVer[4]-NONE-STATUS-STA-NewGrpID-SUM-EOT
+   Server->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-SVer[4]-HVer[4]-ACK-STATUS-STA-SUM-EOT
+------------------------------------------------------------------------------------------------
+[SUBDIV=0x12]
+      KEY->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-FVer[4]-HVer[4]-NONE-STATUS-STA-QNo[4]-SubDivID-SUM-EOT
+   Server->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-SVer[4]-HVer[4]-ACK-STATUS-STA-QNo[4]-SUM-EOT
+------------------------------------------------------------------------------------------------
+[ADDDIV_To_STA=0x13]
+      KEY->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-FVer[4]-HVer[4]-NONE-STATUS-STA-Add_DivID-SUM-EOT
+   Server->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-SVer[4]-HVer[4]-ACK-STATUS-STA-SUM-EOT
+------------------------------------------------------------------------------------------------
+[SCORE=0x14]
+      KEY->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-FVer[4]-HVer[4]-NONE-STATUS-STA-QNo[4]-SCORE-SUM-EOT
+   Server->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-SVer[4]-HVer[4]-ACK-STATUS-STA-QNo[4]-SUM-EOT
+------------------------------------------------------------------------------------------------
+[DirectCancel=0x15]
+      KEY->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-FVer[4]-HVer[4]-NONE-STATUS-STA-QNo[4]-SUM-EOT
+   Server->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-SVer[4]-HVer[4]-ACK-STATUS-STA-QNo[4]-SUM-EOT
+------------------------------------------------------------------------------------------------
+[CALL_DIV=0x16]
+      KEY->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-FVer[4]-HVer[4]-NONE-STATUS-STA-QNo[4]-DivID-SUM-EOT
+   Server->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-SVer[4]-HVer[4]-ACK-STATUS-STA-QNo[4]-SUM-EOT
+------------------------------------------------------------------------------------------------
+[RECALL_DIV=0x17]
+      KEY->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-FVer[4]-HVer[4]-NONE-STATUS-STA-QNo[4]-DivID-SUM-EOT
+   Server->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-SVer[4]-HVer[4]-ACK-STATUS-STA-QNo[4]-SUM-EOT
+------------------------------------------------------------------------------------------------
+[REQUEST_CURRENT_STATUS=0x18]
+     KEY->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-FVer[4]-HVer[4]-NONE-STATUS-STA-SUM-EOT
+  Server->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-SVer[4]-HVer[4]-ACK-STATUS-STA-CounterStatus-userID[4]-GrpID-WQ[2]-HQ[2]-QNo[4]-QStatus-DivID-len[2]+(Unicode){UserID+"|"NameUser+"|"+GrpID+"|"+GrpName}-SUM-EOT
+------------------------------------------------------------------------------------------------
+================================================================================================
+2.DISPLAY(TCP_PORT 20103):
+Format:
+      Server->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-SVer[4]-HVer[4]-NONE-STATUS-DATA-SUM-EOT
+Display(Ack)->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-FVer[4]-HVer[4]-ACK-STATUS-SUM-EOT
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+[SYNC=0x00]
+      Server->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-SVer[4]-HVer[4]-NONE-STATUS-SUM-EOT
+Display(Ack)->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-FVer[4]-HVer[4]-ACK-STATUS-SUM-EOT
+------------------------------------------------------------------------------------------------
+[SHOW_Q=0x01]
+      Server->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-SVer[4]-HVer[4]-NONE-STATUS-QStart[4]-QEnd[4]-station_id-arrowLeft-arrowRight-show-nBLINK-soundType-SUM-EOT
+Display(Ack)->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-FVer[4]-HVer[4]-ACK-STATUS-SUM-EOT
+------------------------------------------------------------------------------------------------
+[SHOW_WAITINGQ=0x02]
+      Server->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-SVer[4]-HVer[4]-NONE-STATUS-WaitQ[2]-nBLINK-SHOW-SUM-EOT
+Display(Ack)->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-FVer[4]-HVer[4]-ACK-STATUS-SUM-EOT
+------------------------------------------------------------------------------------------------
+[SHOW_ESTWAITIME=0x03]
+      Server->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-SVer[4]-HVer[4]-NONE-STATUS-WaitQ[2]-nBLINK-SHOW-SUM-EOT
+Display(Ack)->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-FVer[4]-HVer[4]-ACK-STATUS-SUM-EOT
+------------------------------------------------------------------------------------------------
+================================================================================================
+3.QTOUCH(QControler Listen_TCP_PORT 20004):
+Format:
+QTOUCH->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-SVer[4]-HVer[4]-NONE-STATUS-DATA-SUM-EOT
+Server->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-SVer[4]-HVer[4]-ACK-STATUS-DATA-SUM-EOT
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+[SYNC=0x00]
+QTOUCH->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-SVer[4]-HVer[4]-NONE-STATUS-SUM-EOT
+Server->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-SVer[4]-HVer[4]-ACK-STATUS-SUM
+------------------------------------------------------------------------------------------------
+[REQUEST_Q=0x01]
+QTOUCH->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-SVer[4]-HVer[4]-NONE-STATUS-DivID-TEXT_LEN[2]-TEXT_DATA-SUM-EOT
+Server->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-SVer[4]-HVer[4]-ACK-STATUS-DATETIME[7]-QueueNo[4]-Copy-
+       WaitQ[2]-AprxWaitTime[2]-NumPrint[2]-TEXT_LEN[2]-TEXT_DATA-SUM-EOT
+Remark: DATETIME[7]=YYYY-MM-DD-hh-mm-ss
+------------------------------------------------------------------------------------------------
+================================================================================================
+4.QDISPLAY(TCP_PORT 20105):
+Format:
+      Server->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-SVer[4]-HVer[4]-NONE-STATUS-DATA-SUM-EOT
+Display(Ack)->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-SVer[4]-HVer[4]-ACK-STATUS-SUM-EOT
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+[SYNC=0x00]
+       Server->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-SVer[4]-HVer[4]-NONE-STATUS-SUM-EOT
+QDisplay(Ack)->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-SVer[4]-HVer[4]-ACK-STATUS-SUM-EOT
+------------------------------------------------------------------------------------------------
+[SHOW_Q=0x01]
+       Server->STX-LEN[2]-CMD-FrameID1-DeviceType-DeviceID-SVer[4]-HVer[4]-NONE-STATUS-QStart[4]-QEnd[4]-SUM-EOT
+QDisplay(Ack)->STX-LEN[2]-CMD-FrameID2-DeviceType-DeviceID-SVer[4]-HVer[4]-ACK-STATUS-SUM-EOT
+------------------------------------------------------------------------------------------------
+================================================================================================
+5.QPRINT(UART):
+Format:
+      Server ->STX-ADDR-LEN[2]-CMD-DATA-SUM-EOT
+  QPRINT(Ack)->STX-ADDR-LEN[2]-CMD-ACK-FVer[4]-HVer[4]-SUM-EOT
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+------------------------------------------------------------------------------------------------
+[SYNC=0x00]
+      Server ->STX-ADDR-LEN[2]-CMD-DATA-SUM-EOT
+  QPRINT(Ack)->STX-ADDR-LEN[2]-CMD-ACK-FVer[4]-HVer[4]-SUM-EOT
+------------------------------------------------------------------------------------------------
+[PUSHEDBTN=0x06]
+Server -> STX-ADDR-LEN[2]-CMD-ticketId-copies-type-lang-qType-qNum3bytes-waitQ2bytes
+			-Date-Month-Year-hh-mm-ss-aprxServeTime2bytes-numPrint2bytes
+			-Prt1_type-Prt1_len(2)-Prt1_Data
+			-SUM-EOT
+
+QPRINT-> STX-ADDR-bh-bl-CMD-ACK-sum-EOT
+<comment>
+QType : 1=4Digit,2=3Digit,3=NoZero
+Prt1_type: 	0x00 = don't have message
+			0x01 = have message
+
+Prt1_len:  Length of Prt1_Data (Max 500 bytes)
+Prt1_Data: (Prt1_type=0x01) => bytes array of big-endian Unicode message
+================================================================================================
+================================================================================================
+6.QSOUND(UART):
+Format:
+ Server ->STX-ADDR-LEN[2]-CMD-DATA-SUM-EOT
+  QSOUND(Ack)->STX-ADDR-LEN[2]-CMD-ACK-FVer[4]-HVer[4]-SUM-EOT
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+[SYNC=0xFF]
+      Server ->STX-ADDR-LEN[2]-CMD-SUM-EOT
+ QSOUND((Ack)->STX-ADDR-LEN[2]-CMD-ACK-FVer[4]-HVer[4]-SUM-EOT
+------------------------------------------------------------------------------------------------
+[SPAN_CALL=0x03]
+      Server ->STX-ADDR-LEN[2]-CMD-QStart[4]-QEnd[4]-StaNo-SoundType-Times-SUM-EOT
+ QSOUND((Ack)->STX-ADDR-LEN[2]-CMD-ACK-FVer[4]-HVer[4]-SUM-EOT
+================================================================================================
+7.SCOREBOX(TCP):
+Format:
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+------------------------------------------------------------------------------------------------
+================================================================================================
