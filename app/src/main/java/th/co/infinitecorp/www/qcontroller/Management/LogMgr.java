@@ -1,6 +1,7 @@
 package th.co.infinitecorp.www.qcontroller.Management;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -784,5 +785,24 @@ public class LogMgr {
     }
     public static boolean Delete_StationSetting(Context context){
         return ExternalStorage.deleteFile(new File(context.getExternalFilesDir(FolderPath.MASTER), FileName.QClientWebStationSetting_JSON));
+    }
+
+    //--Setting System
+    public static boolean SaveSettingSystem(Context context, Setting_System infos) {
+        Type type = new TypeToken<Setting_System>() {}.getType();
+        Gson gson = new Gson();
+        String json = gson.toJson(infos, type);
+        return ExternalStorage.writeFile(new File(context.getExternalFilesDir(FolderPath.MASTER), FileName.Setting_System),json);
+    }
+    public static Setting_System GetSetting_System(Context context) {
+        String strData=ExternalStorage.readFile(new File(context.getExternalFilesDir(FolderPath.MASTER), FileName.StaMapGroupInfo_JSON));
+        Type type = new TypeToken<Setting_System>(){}.getType();
+        if (!strData.equals("")) {
+            Gson gson = new Gson();
+            Setting_System listLog = gson.fromJson(strData, type);
+            return listLog;
+        }
+        Setting_System list = new Setting_System();
+        return list;
     }
 }

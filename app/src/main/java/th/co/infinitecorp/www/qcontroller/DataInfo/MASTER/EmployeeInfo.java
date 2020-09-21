@@ -18,10 +18,29 @@ public class EmployeeInfo {
     String Address2;
     String Address1;
     Integer Status;
+    String Code;
 
     public EmployeeInfo()
     {
 
+    }
+
+    public EmployeeInfo(Integer branch_id, String id, String code, String name, String username, String password, Integer status) {
+        this.branch_id = branch_id;
+        this.id = id;
+        this.name = name;
+        this.username = username;
+        this.password = password;
+        Status = status;
+        Code = code;
+    }
+
+    public String getCode() {
+        return Code;
+    }
+
+    public void setCode(String code) {
+        Code = code;
     }
 
     public Integer getBranch_id() {

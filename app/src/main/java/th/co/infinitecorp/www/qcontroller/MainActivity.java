@@ -56,12 +56,6 @@ import th.co.infinitecorp.www.qcontroller.Management.SoundMgr;
 import th.co.infinitecorp.www.qcontroller.Management.SystemMgr;
 import th.co.infinitecorp.www.qcontroller.Management.ViewLogMgr;
 import th.co.infinitecorp.www.qcontroller.QClientWeb.QClientOnWebService;
-import th.co.infinitecorp.www.qcontroller.QTouchWeb.QTouchOnWebService;
-import th.co.infinitecorp.www.qcontroller.Screen.QTouch.TouchScreenStyle1;
-import th.co.infinitecorp.www.qcontroller.Screen.QTouch.TouchScreenStyle1FullscreenActivity;
-import th.co.infinitecorp.www.qcontroller.Screen.Setting.SettingScreen;
-import th.co.infinitecorp.www.qcontroller.Screen.SreenOnWebView.QTouchOnWebView;
-import th.co.infinitecorp.www.qcontroller.Screen.SreenOnWebView.TestQTouchOnWebView;
 import th.co.infinitecorp.www.qcontroller.Service.AllKeyService;
 import th.co.infinitecorp.www.qcontroller.Service.AllSoftkeyService;
 import th.co.infinitecorp.www.qcontroller.Service.DisplayService;
@@ -427,7 +421,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         Button btn_Setting = (Button) findViewById(R.id.btn_Setting);
-        btn_Setting.setVisibility(View.GONE);
         btn_Setting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -436,6 +429,7 @@ public class MainActivity extends AppCompatActivity {
                 //startActivity(new Intent(getApplication(), TestQTouchOnWebView.class));
                 //startActivity(new Intent(getApplication(), TouchScreenStyle1FullscreenActivity.class));
                 //startActivity(new Intent(getApplication(), TouchScreenStyle1.class));
+                startActivity(new Intent(getApplication(), SettingQActivity.class));
             }
         });
 

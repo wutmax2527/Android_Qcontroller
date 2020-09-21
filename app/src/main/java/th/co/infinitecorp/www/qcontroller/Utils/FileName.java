@@ -50,4 +50,7 @@ public  class FileName {
     public static String Station_workinf_bin="station_workinf.bin";
     public static String Ticketchg_tbl="ticketchg.tbl";
     public static String user_workinf_bin="user_workinf.bin";
+
+    //--Setting System
+    public static String Setting_System = "Setting_System.json";
 }

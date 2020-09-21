@@ -237,16 +237,19 @@
                 />
 
         </LinearLayout>
+
         <LinearLayout
             android:id="@+id/layout_QTouchView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="visible"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="gone">
+
             <WebView
+                android:id="@+id/webview"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:id="@+id/webview">
+                tools:visibility="visible">
 
             </WebView>
         </LinearLayout>
