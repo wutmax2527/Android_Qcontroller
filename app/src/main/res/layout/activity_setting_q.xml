@@ -17,12 +17,12 @@
             android:layout_height="match_parent"
             android:gravity="center_horizontal|center_vertical"
             android:orientation="vertical"
-            tools:visibility="visible">
+            tools:visibility="gone">
 
             <Button
                 android:id="@+id/btn_Setting"
-                android:layout_width="400dp"
-                android:layout_height="300dp"
+                android:layout_width="250dp"
+                android:layout_height="200dp"
                 android:scaleType="centerInside"
                 android:text="SETTING"
                 android:textColor="@android:color/background_dark"
@@ -34,8 +34,8 @@
 
             <Button
                 android:id="@+id/btn_QDisplay"
-                android:layout_width="400dp"
-                android:layout_height="300dp"
+                android:layout_width="250dp"
+                android:layout_height="200dp"
                 android:scaleType="centerInside"
                 android:text="QDISPLAY"
                 android:textColor="@android:color/background_dark"
@@ -70,10 +70,10 @@
 
                         <Button
                             android:id="@+id/btn_bk_setting"
-                            android:layout_width="100dp"
-                            android:layout_height="100dp"
-                            android:contentDescription="TODO"
-                            android:scaleType="fitXY"/>
+                            android:layout_width="80dp"
+                            android:layout_height="60dp"
+                            android:scaleType="fitXY"
+                            android:text="Back" />
                     </LinearLayout>
 
                 </LinearLayout>
@@ -90,53 +90,53 @@
                         android:layout_height="wrap_content"
                         android:text="Setting"
                         android:textColor="@android:color/background_dark"
-                        android:textSize="55sp"
+                        android:textSize="35sp"
                         android:textStyle="bold" />
 
                     <Button
                         android:id="@+id/btn_Setting_System"
-                        android:layout_width="350dp"
-                        android:layout_height="150dp"
+                        android:layout_width="300dp"
+                        android:layout_height="60dp"
                         android:layout_marginTop="30dp"
                         android:text="System"
                         android:textColor="@android:color/background_dark"
-                        android:textSize="30sp" />
-
-                    <Button
-                        android:id="@+id/btn_Setting_User"
-                        android:layout_width="350dp"
-                        android:layout_height="150dp"
-                        android:layout_marginTop="30dp"
-                        android:text="User Management"
-                        android:textColor="@android:color/background_dark"
-                        android:textSize="30sp" />
-
-                    <Button
-                        android:id="@+id/btn_Setting_Profile"
-                        android:layout_width="350dp"
-                        android:layout_height="150dp"
-                        android:layout_marginTop="30dp"
-                        android:text="Profile"
-                        android:textColor="@android:color/background_dark"
-                        android:textSize="30sp" />
-
-                    <Button
-                        android:id="@+id/btn_Setting_Resource"
-                        android:layout_width="350dp"
-                        android:layout_height="150dp"
-                        android:layout_marginTop="30dp"
-                        android:text="Resource"
-                        android:textColor="@android:color/background_dark"
-                        android:textSize="30sp" />
+                        android:textSize="18sp" />
 
                     <Button
                         android:id="@+id/btn_Setting_Branch"
-                        android:layout_width="350dp"
-                        android:layout_height="150dp"
+                        android:layout_width="300dp"
+                        android:layout_height="60dp"
                         android:layout_marginTop="30dp"
                         android:text="Branch INFO"
                         android:textColor="@android:color/background_dark"
-                        android:textSize="30sp" />
+                        android:textSize="18sp" />
+
+                    <Button
+                        android:id="@+id/btn_Setting_User"
+                        android:layout_width="300dp"
+                        android:layout_height="60dp"
+                        android:layout_marginTop="30dp"
+                        android:text="User Management"
+                        android:textColor="@android:color/background_dark"
+                        android:textSize="18sp" />
+
+                    <Button
+                        android:id="@+id/btn_Setting_Profile"
+                        android:layout_width="300dp"
+                        android:layout_height="60dp"
+                        android:layout_marginTop="30dp"
+                        android:text="Profile"
+                        android:textColor="@android:color/background_dark"
+                        android:textSize="18sp" />
+
+                    <Button
+                        android:id="@+id/btn_Setting_Resource"
+                        android:layout_width="300dp"
+                        android:layout_height="60dp"
+                        android:layout_marginTop="30dp"
+                        android:text="Resource"
+                        android:textColor="@android:color/background_dark"
+                        android:textSize="18sp" />
 
                 </LinearLayout>
 
@@ -185,11 +185,12 @@
 
                         <Button
                             android:id="@+id/btn_bk_setting_system"
-                            android:layout_width="100dp"
-                            android:layout_height="100dp"
-                            android:contentDescription="TODO"
+                            android:layout_width="80dp"
+                            android:layout_height="60dp"
                             android:padding="10dp"
-                            android:scaleType="fitXY" />
+                            android:scaleType="fitXY"
+                            android:text="Back"
+                            android:textColor="@color/Black" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -202,10 +203,10 @@
                         <Button
                             android:id="@+id/btn_home_setting_system"
                             android:layout_width="100dp"
-                            android:layout_height="100dp"
-                            android:contentDescription="TODO"
+                            android:layout_height="60dp"
                             android:padding="20dp"
-                            android:scaleType="fitXY" />
+                            android:scaleType="fitXY"
+                            android:text="Home" />
                     </LinearLayout>
 
                 </LinearLayout>
@@ -218,7 +219,7 @@
 
                     <Space
                         android:layout_width="match_parent"
-                        android:layout_height="130dp" />
+                        android:layout_height="80dp" />
 
                     <TextView
                         android:id="@+id/textView9"
@@ -226,23 +227,25 @@
                         android:layout_height="wrap_content"
                         android:text="SYSTEM"
                         android:textColor="@android:color/background_dark"
-                        android:textSize="60dp"
+                        android:textSize="35sp"
                         android:textStyle="bold" />
 
                     <Space
                         android:layout_width="match_parent"
-                        android:layout_height="50dp" />
+                        android:layout_height="20dp" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
                         android:gravity="center|center_horizontal|center_vertical"
                         android:orientation="horizontal"
                         android:padding="20dp">
 
                         <android.widget.Switch
                             android:id="@+id/switch_mode"
-                            android:layout_width="450dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:checked="true"
                             android:showText="true"
@@ -250,7 +253,7 @@
                             android:text="Mode"
                             android:textOff="Offline"
                             android:textOn="Online"
-                            android:textSize="40dp"
+                            android:textSize="20sp"
                             android:textStyle="bold"
                             android:thumb="@drawable/switch_thumb"
                             android:track="@drawable/switch_track" />
@@ -261,19 +264,19 @@
                         android:id="@+id/lt_Setting_System_Server"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
                         android:orientation="horizontal"
-                        android:paddingLeft="20dp"
-                        android:paddingTop="40dp"
-                        android:paddingRight="20dp"
-                        android:paddingBottom="40dp">
+                        android:paddingTop="20dp"
+                        android:paddingBottom="20dp">
 
                         <TextView
                             android:id="@+id/textView"
-                            android:layout_width="200dp"
+                            android:layout_width="100dp"
                             android:layout_height="wrap_content"
                             android:text="Server"
                             android:textColor="@android:color/background_dark"
-                            android:textSize="40dp"
+                            android:textSize="20sp"
                             android:textStyle="bold" />
 
                         <EditText
@@ -286,26 +289,26 @@
                             android:hint="127.0.0.1/api/"
                             android:inputType="textPersonName"
                             android:textColor="@android:color/background_dark"
-                            android:textSize="36sp" />
+                            android:textSize="20sp" />
                     </LinearLayout>
 
                     <LinearLayout
                         android:id="@+id/lt_Setting_System_Branch"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
                         android:orientation="horizontal"
-                        android:paddingLeft="20dp"
-                        android:paddingTop="40dp"
-                        android:paddingRight="20dp"
-                        android:paddingBottom="40dp">
+                        android:paddingTop="20dp"
+                        android:paddingBottom="20dp">
 
                         <TextView
                             android:id="@+id/textView3"
-                            android:layout_width="200dp"
+                            android:layout_width="100dp"
                             android:layout_height="wrap_content"
                             android:text="Branch ID"
                             android:textColor="@android:color/background_dark"
-                            android:textSize="40dp"
+                            android:textSize="20sp"
                             android:textStyle="bold" />
 
                         <EditText
@@ -318,7 +321,7 @@
                             android:hint="99999999"
                             android:inputType="textPersonName"
                             android:textColor="@android:color/background_dark"
-                            android:textSize="36sp" />
+                            android:textSize="20sp" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -334,7 +337,7 @@
                             android:layout_height="wrap_content"
                             android:text="Save"
                             android:textColor="@android:color/background_dark"
-                            android:textSize="40dp"
+                            android:textSize="30dp"
                             android:textStyle="bold" />
                     </LinearLayout>
                 </LinearLayout>
@@ -373,10 +376,10 @@
 
                             <Button
                                 android:id="@+id/btn_bk_user"
-                                android:layout_width="100dp"
-                                android:layout_height="100dp"
-                                android:contentDescription="TODO"
-                                android:scaleType="fitXY" />
+                                android:layout_width="80dp"
+                                android:layout_height="60dp"
+                                android:scaleType="fitXY"
+                                android:text="Back" />
                         </LinearLayout>
 
                         <LinearLayout
@@ -389,9 +392,9 @@
                             <Button
                                 android:id="@+id/btn_home_user"
                                 android:layout_width="100dp"
-                                android:layout_height="100dp"
-                                android:contentDescription="TODO"
-                                android:scaleType="fitXY"/>
+                                android:layout_height="60dp"
+                                android:scaleType="fitXY"
+                                android:text="Home" />
                         </LinearLayout>
 
                     </LinearLayout>
@@ -399,9 +402,9 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:layout_marginTop="5dp"
                         android:gravity="center_horizontal"
-                        android:orientation="vertical"
-                        android:paddingTop="60dp">
+                        android:orientation="vertical">
 
                         <RelativeLayout
                             android:layout_width="match_parent"
@@ -416,10 +419,10 @@
 
                                 <Button
                                     android:id="@+id/btn_user_addEmp"
-                                    android:layout_width="100dp"
-                                    android:layout_height="100dp"
-                                    android:contentDescription="TODO"
-                                    android:scaleType="fitXY" />
+                                    android:layout_width="60dp"
+                                    android:layout_height="60dp"
+                                    android:scaleType="fitXY"
+                                    android:text="Add" />
                             </LinearLayout>
 
                             <LinearLayout
@@ -435,7 +438,7 @@
                                     android:layout_height="wrap_content"
                                     android:text="USER INFO"
                                     android:textColor="@android:color/background_dark"
-                                    android:textSize="50dp"
+                                    android:textSize="35sp"
                                     android:textStyle="bold" />
                             </LinearLayout>
 
@@ -493,7 +496,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            tools:visibility="gone">
+            tools:visibility="visible">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -518,11 +521,12 @@
                             android:orientation="horizontal">
 
                             <Button
-                                android:id="@+id/imageButton"
-                                android:layout_width="100dp"
-                                android:layout_height="100dp"
-                                android:contentDescription="TODO"
-                                android:scaleType="fitXY"/>
+                                android:id="@+id/btn_bk_setting_branch"
+                                android:layout_width="80dp"
+                                android:layout_height="60dp"
+                                android:scaleType="fitXY"
+                                android:text="Back"
+                                android:textColor="@color/Black" />
                         </LinearLayout>
 
                         <LinearLayout
@@ -533,27 +537,28 @@
                             android:orientation="horizontal">
 
                             <Button
-                                android:id="@+id/imageButton3"
+                                android:id="@+id/btn_home_branch"
                                 android:layout_width="100dp"
-                                android:layout_height="100dp"
-                                android:contentDescription="TODO"
-                                android:scaleType="fitXY" />
+                                android:layout_height="60dp"
+                                android:scaleType="fitXY"
+                                android:text="Home" />
                         </LinearLayout>
                     </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:layout_marginTop="10dp"
                         android:orientation="vertical">
 
                         <TextView
                             android:id="@+id/textView6"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="BRANCH INFO"
+                            android:text="Branch Info"
                             android:textAlignment="center"
                             android:textColor="@android:color/background_dark"
-                            android:textSize="50sp"
+                            android:textSize="35sp"
                             android:textStyle="bold" />
 
                         <LinearLayout
@@ -563,114 +568,183 @@
                             android:orientation="horizontal">
 
                             <TextView
-                                android:id="@+id/textView15"
+                                android:id="@+id/txt_branch_id"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:text="Branch ID : 99999"
                                 android:textAlignment="center"
                                 android:textColor="@android:color/background_dark"
-                                android:textSize="30sp" />
+                                android:textSize="20sp" />
                         </LinearLayout>
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal">
+                            android:orientation="horizontal"
+                            android:paddingTop="8dp"
+                            android:paddingBottom="8dp">
 
                             <TextView
                                 android:id="@+id/textView16"
-                                android:layout_width="wrap_content"
+                                android:layout_width="90dp"
                                 android:layout_height="wrap_content"
-                                android:text="Branch Code" />
+                                android:text="Branch Code"
+                                android:textAlignment="textEnd"
+                                android:textColor="@color/Black"
+                                android:textSize="15sp" />
 
                             <EditText
-                                android:id="@+id/editTextTextPersonName"
+                                android:id="@+id/txt_branch_code"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:layout_marginLeft="10dp"
                                 android:layout_weight="1"
                                 android:ems="10"
                                 android:inputType="textPersonName"
-                                android:text="Name" />
+                                android:textColor="@color/Black"
+                                android:textSize="15sp" />
                         </LinearLayout>
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal">
+                            android:orientation="horizontal"
+                            android:paddingTop="8dp"
+                            android:paddingBottom="8dp">
 
                             <TextView
                                 android:id="@+id/textView17"
-                                android:layout_width="wrap_content"
+                                android:layout_width="90dp"
                                 android:layout_height="wrap_content"
-                                android:text="Branch Name" />
+                                android:text="Branch Name"
+                                android:textAlignment="textEnd"
+                                android:textColor="@color/Black"
+                                android:textSize="15sp" />
 
                             <EditText
-                                android:id="@+id/editTextTextPersonName2"
+                                android:id="@+id/txt_branch_name"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:layout_marginLeft="10dp"
                                 android:layout_weight="1"
                                 android:ems="10"
                                 android:inputType="textPersonName"
-                                android:text="Name" />
+                                android:textColor="@color/Black"
+                                android:textSize="15sp" />
                         </LinearLayout>
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal">
+                            android:orientation="horizontal"
+                            android:paddingTop="8dp"
+                            android:paddingBottom="8dp">
 
                             <TextView
                                 android:id="@+id/textView18"
-                                android:layout_width="wrap_content"
+                                android:layout_width="90dp"
                                 android:layout_height="wrap_content"
-                                android:text="IP" />
+                                android:text="IP"
+                                android:textAlignment="textEnd"
+                                android:textColor="@color/Black"
+                                android:textSize="15sp" />
 
                             <EditText
-                                android:id="@+id/editTextTextPersonName3"
+                                android:id="@+id/txt_branch_IP"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:layout_marginLeft="10dp"
                                 android:layout_weight="1"
                                 android:ems="10"
                                 android:inputType="textPersonName"
-                                android:text="Name" />
+                                android:textColor="@color/Black"
+                                android:textSize="15sp" />
                         </LinearLayout>
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal">
+                            android:orientation="horizontal"
+                            android:paddingTop="8dp"
+                            android:paddingBottom="8dp">
 
                             <TextView
                                 android:id="@+id/textView19"
+                                android:layout_width="90dp"
+                                android:layout_height="wrap_content"
+                                android:text="Open Time"
+                                android:textAlignment="textEnd"
+                                android:textColor="@color/Black"
+                                android:textSize="15sp" />
+
+                            <TextView
+                                android:id="@+id/txt_branch_open"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:layout_marginLeft="10dp"
                                 android:layout_weight="1"
-                                android:text="Open Time" />
+                                android:text="00:00"
+                                android:textAlignment="center"
+                                android:textColor="@color/Black"
+                                android:textSize="15sp" />
+
+                            <Button
+                                android:id="@+id/btn_branch_open"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Click" />
                         </LinearLayout>
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal">
+                            android:orientation="horizontal"
+                            android:paddingTop="8dp"
+                            android:paddingBottom="8dp">
 
                             <TextView
                                 android:id="@+id/textView20"
+                                android:layout_width="90dp"
+                                android:layout_height="wrap_content"
+                                android:text="Close Time"
+                                android:textAlignment="textEnd"
+                                android:textColor="@color/Black"
+                                android:textSize="15sp" />
+
+                            <TextView
+                                android:id="@+id/txt_branch_close"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:layout_marginLeft="10dp"
                                 android:layout_weight="1"
-                                android:text="Close Time" />
+                                android:text="00:00"
+                                android:textAlignment="center"
+                                android:textColor="@color/Black"
+                                android:textSize="15sp" />
+
+                            <Button
+                                android:id="@+id/btn_branch_close"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Click" />
                         </LinearLayout>
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"></LinearLayout>
+                            android:gravity="center"
+                            android:orientation="horizontal"
+                            android:paddingTop="10dp">
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"></LinearLayout>
+                            <Button
+                                android:id="@+id/btn_save_branch"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Save"
+                                android:textColor="@color/Black" />
+                        </LinearLayout>
+
                     </LinearLayout>
 
                 </LinearLayout>

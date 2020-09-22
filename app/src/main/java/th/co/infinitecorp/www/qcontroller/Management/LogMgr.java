@@ -795,7 +795,7 @@ public class LogMgr {
         return ExternalStorage.writeFile(new File(context.getExternalFilesDir(FolderPath.MASTER), FileName.Setting_System),json);
     }
     public static Setting_System GetSetting_System(Context context) {
-        String strData=ExternalStorage.readFile(new File(context.getExternalFilesDir(FolderPath.MASTER), FileName.StaMapGroupInfo_JSON));
+        String strData=ExternalStorage.readFile(new File(context.getExternalFilesDir(FolderPath.MASTER), FileName.Setting_System));
         Type type = new TypeToken<Setting_System>(){}.getType();
         if (!strData.equals("")) {
             Gson gson = new Gson();

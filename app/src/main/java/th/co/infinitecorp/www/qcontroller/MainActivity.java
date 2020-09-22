@@ -50,8 +50,10 @@ import th.co.infinitecorp.www.qcontroller.GPIO.GPIOService;
 import th.co.infinitecorp.www.qcontroller.Management.APIMgr;
 import th.co.infinitecorp.www.qcontroller.Management.DisplayMgr;
 import th.co.infinitecorp.www.qcontroller.Management.InitializeMgr;
+import th.co.infinitecorp.www.qcontroller.Management.LogMgr;
 import th.co.infinitecorp.www.qcontroller.Management.PeriperalMgr;
 import th.co.infinitecorp.www.qcontroller.Management.QueueMgr;
+import th.co.infinitecorp.www.qcontroller.Management.Setting_System;
 import th.co.infinitecorp.www.qcontroller.Management.SoundMgr;
 import th.co.infinitecorp.www.qcontroller.Management.SystemMgr;
 import th.co.infinitecorp.www.qcontroller.Management.ViewLogMgr;
@@ -147,6 +149,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Log.d(TAG, "Start App...");
+        Setting_System system = LogMgr.GetSetting_System(MainActivity.this);
+        if(system != null)
+        {
+            GData.Branch_ID = system.getBranchID();
+            GData.TARGET_SERVER = system.getServer();
+            GData.ONLINE_MODE = system.getModeOnline();
+        }
         tv_MessageDebug = (TextView) findViewById(R.id.tv_MessageDebug);
         tv_MessageDebug.setText(messageDebug);
         tv_MessageDebug.setMovementMethod(new ScrollingMovementMethod());

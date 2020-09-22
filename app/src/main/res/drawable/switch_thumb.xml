@@ -2,7 +2,7 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_checked="true">
         <shape android:shape="rectangle">
-            <size android:width="40dp" android:height="50dp" />
+            <size android:width="100dp" android:height="50dp" />
             <padding
                 android:left="10dp"
                 android:right="10dp"
@@ -18,7 +18,7 @@
 
     <item android:state_checked="false">
         <shape android:shape="rectangle" >
-            <size android:width="40dp" android:height="50dp" />
+            <size android:width="100dp" android:height="50dp" />
             <padding
                 android:left="10dp"
                 android:right="10dp"

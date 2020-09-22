@@ -44,6 +44,7 @@ public class GData {
     public static Integer SERVE_ID=0;
     public static Integer Branch_ID=99997;
     public static String TARGET_SERVER="10.172.100.107";//"10.172.100.51";
+    public static  boolean ONLINE_MODE = true;
 
     public static boolean IsShowThredRun=false;
 

@@ -4,5 +4,7 @@
         <domain includeSubdomains="true">127.0.0.1</domain>
        <domain includeSubdomains="true">127.0.0.1:20601</domain>
     </domain-config> -->
-
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">10.172.100.107</domain>
+    </domain-config>
 </network-security-config>

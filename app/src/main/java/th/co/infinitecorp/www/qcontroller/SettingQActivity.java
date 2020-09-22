@@ -2,11 +2,13 @@ package th.co.infinitecorp.www.qcontroller;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.TimePickerDialog;
 import android.graphics.Color;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,13 +20,24 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
+import org.greenrobot.eventbus.EventBus;
+import org.w3c.dom.Text;
+
+import java.util.Calendar;
 import java.util.List;
 
+import th.co.infinitecorp.www.qcontroller.ADAPTER.EmpInfoAdapter;
+import th.co.infinitecorp.www.qcontroller.API.QcontrollerApi;
+import th.co.infinitecorp.www.qcontroller.DataInfo.MASTER.BranchInfo;
+import th.co.infinitecorp.www.qcontroller.DataInfo.MASTER.DivInfo;
 import th.co.infinitecorp.www.qcontroller.DataInfo.MASTER.EmployeeInfo;
+import th.co.infinitecorp.www.qcontroller.EventBus.DebugMessageEvent;
 import th.co.infinitecorp.www.qcontroller.Management.LogMgr;
 import th.co.infinitecorp.www.qcontroller.Management.Setting_System;
+import th.co.infinitecorp.www.qcontroller.Utils.GData;
 
 public class SettingQActivity extends AppCompatActivity {
 
@@ -32,10 +45,10 @@ public class SettingQActivity extends AppCompatActivity {
     private LinearLayout lt_Setting_System, lt_Setting_User, lt_Setting_Profile, lt_Setting_Branch, lt_Setting_Resource;
     private LinearLayout lt_Setting_System_Server, lt_Setting_System_Branch;
     private Switch switch_mode;
-    private TextView txt_system_server, txt_system_branchid;
+    private TextView txt_system_server, txt_system_branchid,txt_branch_id,txt_branch_code,txt_branch_name,txt_branch_IP,txt_branch_open,txt_branch_close;
 
-    private Button btn_setting, btn_QDisplay, btn_Setting_System, btn_Setting_User, btn_Setting_Profile, btn_Setting_Branch, btn_Setting_Resource, btn_save_system,btn_user_addEmp_save;
-    private Button btn_bk_setting, btn_bk_setting_system, btn_home_setting_system,btn_bk_user,btn_user_addEmp,btn_home_user;
+    private Button btn_setting, btn_QDisplay, btn_Setting_System, btn_Setting_User, btn_Setting_Profile, btn_Setting_Branch, btn_Setting_Resource, btn_save_system,btn_save_branch,btn_branch_open,btn_branch_close;
+    private Button btn_bk_setting, btn_bk_setting_system, btn_home_setting_system,btn_bk_user,btn_user_addEmp,btn_home_user,btn_bk_setting_branch,btn_home_branch;
 
     RecyclerView.LayoutManager layoutManager;
     RecyclerView RC_EmpInfo;
@@ -56,6 +69,21 @@ public class SettingQActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting_q);
+        ConnectView();
+        if(GData.ONLINE_MODE)
+        {
+            CallAPI();
+            btn_user_addEmp.setVisibility(View.GONE);
+            lt_Setting_System_Server.setVisibility(View.VISIBLE);
+            lt_Setting_System_Branch.setVisibility(View.VISIBLE);
+        }else
+        {
+            btn_user_addEmp.setVisibility(View.VISIBLE);
+            lt_Setting_System_Server.setVisibility(View.GONE);
+            lt_Setting_System_Branch.setVisibility(View.GONE);
+        }
+        RefreshData();
+        ChangePage(MyPage.Main);
     }
 
     private void ConnectView() {
@@ -72,11 +100,14 @@ public class SettingQActivity extends AppCompatActivity {
         lt_Setting_System_Branch = (LinearLayout) findViewById(R.id.lt_Setting_System_Branch);
 
         txt_system_server = (TextView) findViewById(R.id.txt_system_server);
+        txt_system_server.setText(GData.TARGET_SERVER);
         txt_system_branchid = (TextView) findViewById(R.id.txt_system_branchid);
+        txt_system_branchid.setText(GData.Branch_ID.toString());
 
         RC_EmpInfo = (RecyclerView)findViewById(R.id.RC_EmpInfo);
 
         switch_mode = (Switch) findViewById(R.id.switch_mode);
+        switch_mode.setChecked(GData.ONLINE_MODE);
         switch_mode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
@@ -184,28 +215,34 @@ public class SettingQActivity extends AppCompatActivity {
                     try {
                         branchID = Integer.parseInt(txt_system_branchid.getText().toString());
                     } catch (Exception ex) {
-                        branchID = 0;
+                        branchID = -1;
                     }
                 }
                 Setting_System system = new Setting_System(switch_mode.isChecked(), txt_server, branchID);
-                //Cookies.SaveSettingSystem(MainActivity.this, system);
+
                 if(LogMgr.SaveSettingSystem(SettingQActivity.this,system))
                 {
                     Toast.makeText(SettingQActivity.this, "บึนทึกข้อมูล STSTEM สำเร็จ", Toast.LENGTH_LONG).show();
+                    GData.Branch_ID = branchID;
+                    GData.TARGET_SERVER = txt_system_server.getText().toString();
+                    GData.ONLINE_MODE = switch_mode.isChecked();
+
                 }else
-                    {
-                        Toast.makeText(SettingQActivity.this, "บึนทึกข้อมูล STSTEM สำเร็จ", Toast.LENGTH_LONG).show();
-                    }
+                {
+                    Toast.makeText(SettingQActivity.this, "บึนทึกข้อมูล STSTEM สำเร็จ", Toast.LENGTH_LONG).show();
+                }
 
                 hideKeyboard(SettingQActivity.this);
                 if(switch_mode.isChecked())
                 {
-//                    CallAPI();
+                    CallAPI();
+                    btn_user_addEmp.setVisibility(View.GONE);
                 }else
                 {
                     btn_user_addEmp.setVisibility(View.VISIBLE);
-                    //Cookies.ClearCookies(SettingQActivity.this,"EMPLOYEE");
+                    LogMgr.Delete_EmployeeInfo(SettingQActivity.this);
                 }
+                RefreshData();
             }
         });
 
@@ -283,34 +320,41 @@ public class SettingQActivity extends AppCompatActivity {
                             txt_add_emp_user.setHintTextColor(Color.GRAY);
                             txt_add_emp_pass.setHintTextColor(Color.GRAY);
 
-                            Setting_System system = LogMgr.GetSetting_System(getApplication());
+                            //Setting_System system = LogMgr.GetSetting_System(getApplication());
 
                             List<EmployeeInfo> employeeInfoList = LogMgr.Load_EmployeeInfo(SettingQActivity.this);
                             if(employeeInfoList != null && employeeInfoList.size() > 0)
                             {
-//                                EmployeeInfo empID =  employeeInfoList.stream().filter(s -> s.getId().equals(id)).findFirst().orElse(null);
-//                                if(empID != null)
-//                                {
-//                                    Toast.makeText(SettingQActivity.this,"ID นี้มีอยู่ในระบบแล้ว" ,Toast.LENGTH_LONG).show();
-//                                    return;
-//                                }
-//                                EmployeeInfo empCode =  employeeInfoList.stream().filter(s -> s.getId().equals(code)).findFirst().orElse(null);
-//                                if(empCode != null)
-//                                {
-//                                    Toast.makeText(SettingQActivity.this,"Code นี้มีอยู่ในระบบแล้ว" ,Toast.LENGTH_LONG).show();
-//                                    return;
-//                                }
-//                                EmployeeInfo empUser =  employeeInfoList.stream().filter(s -> s.getId().equals(user)).findFirst().orElse(null);
-//                                if(empUser != null)
-//                                {
-//                                    Toast.makeText(SettingQActivity.this,"Username นี้มีอยู่ในระบบแล้ว" ,Toast.LENGTH_LONG).show();
-//                                    return;
-//                                }
+                                for (EmployeeInfo data : employeeInfoList)
+                                {
+                                    if(data.getId() != null && data.getId().equals(id))
+                                    {
+                                        Toast.makeText(SettingQActivity.this,"ID นี้มีอยู่ในระบบแล้ว" ,Toast.LENGTH_LONG).show();
+                                        return;
+                                     }else if(data.getCode() != null && data.getCode().equals(code))
+                                    {
+                                        Toast.makeText(SettingQActivity.this,"Code นี้มีอยู่ในระบบแล้ว" ,Toast.LENGTH_LONG).show();
+                                        return;
+                                    }else if(data.getUsername() != null && data.getUsername().equals(user))
+                                    {
+                                        Toast.makeText(SettingQActivity.this,"Username นี้มีอยู่ในระบบแล้ว" ,Toast.LENGTH_LONG).show();
+                                        return;
+                                    }
+                                }
                             }
-//                            employeeInfoList.add(new EmployeeInfo(system.getBranchID(),id,name,user,pass,code));
-//                            Cookies.SaveEmployeeInfo(SettingQActivity.this,employeeInfoList);
-//                            EmployeeInfo();
-                            Toast.makeText(SettingQActivity.this,"บันทึกข้อมูลพนักงานสำเร็จ",Toast.LENGTH_LONG).show();
+                            List<EmployeeInfo> empInfoList = LogMgr.Load_EmployeeInfo(SettingQActivity.this);
+                            EmployeeInfo empNewData = new EmployeeInfo(GData.Branch_ID,id,code,name,user,pass);
+                            empInfoList.add(empNewData);
+                            if(LogMgr.Save_EmployeeInfo(SettingQActivity.this,empInfoList))
+                            {
+                                Toast.makeText(SettingQActivity.this,"บันทึกข้อมูลพนักงานสำเร็จ",Toast.LENGTH_LONG).show();
+                                RefreshData();
+                                dialog.dismiss();
+                            }else
+                                {
+                                    Toast.makeText(SettingQActivity.this,"บันทึกข้อมูลพนักงานไม่สำเร็จ",Toast.LENGTH_LONG).show();
+                                }
+
                             dialog.dismiss();
                         }
                     }
@@ -318,6 +362,161 @@ public class SettingQActivity extends AppCompatActivity {
                 dialog.show();
             }
         });
+
+        btn_bk_setting_branch = (Button)findViewById(R.id.btn_bk_setting_branch);
+        btn_bk_setting_branch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ChangePage(MyPage.Setting);
+            }
+        });
+        btn_home_branch = (Button)findViewById(R.id.btn_home_branch);
+        btn_home_branch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ChangePage(MyPage.Main);
+            }
+        });
+        txt_branch_id = (TextView)findViewById(R.id.txt_branch_id);
+        txt_branch_code = (TextView)findViewById(R.id.txt_branch_code);
+        txt_branch_name = (TextView)findViewById(R.id.txt_branch_name);
+        txt_branch_IP = (TextView)findViewById(R.id.txt_branch_IP);
+        txt_branch_open = (TextView)findViewById(R.id.txt_branch_open);
+        txt_branch_close = (TextView)findViewById(R.id.txt_branch_close);
+        btn_branch_open = (Button)findViewById(R.id.btn_branch_open);
+        btn_branch_open.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final Calendar cldr = Calendar.getInstance();
+                int hour = cldr.get(Calendar.HOUR_OF_DAY);
+                int minutes = cldr.get(Calendar.MINUTE);
+                // time picker dialog
+                TimePickerDialog picker = new TimePickerDialog(SettingQActivity.this,
+                        new TimePickerDialog.OnTimeSetListener() {
+                            @Override
+                            public void onTimeSet(TimePicker tp, int sHour, int sMinute) {
+                                txt_branch_open.setText(String.format("%02d", sHour) + ":" + String.format("%02d", sMinute));
+                            }
+                        }, hour, minutes, true);
+                picker.show();
+            }
+        });
+        btn_branch_close = (Button)findViewById(R.id.btn_branch_close);
+        btn_branch_close.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final Calendar cldr = Calendar.getInstance();
+                int hour = cldr.get(Calendar.HOUR_OF_DAY);
+                int minutes = cldr.get(Calendar.MINUTE);
+                // time picker dialog
+                TimePickerDialog picker = new TimePickerDialog(SettingQActivity.this,
+                        new TimePickerDialog.OnTimeSetListener() {
+                            @Override
+                            public void onTimeSet(TimePicker tp, int sHour, int sMinute) {
+                                txt_branch_close.setText(String.format("%02d", sHour) + ":" + String.format("%02d", sMinute));
+                            }
+                        }, hour, minutes, true);
+                picker.show();
+            }
+        });
+        btn_save_branch = (Button)findViewById(R.id.btn_save_branch);
+        btn_save_branch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String ip = txt_branch_IP.getText().toString();
+                if(ip.equals(""))
+                {
+                    Toast.makeText(SettingQActivity.this,"กรุณากรอก IP",Toast.LENGTH_LONG).show();
+                    return;
+                }
+            }
+        });
+
+    }
+
+    private void RefreshData()
+    {
+        //EmployeeInfo
+        List<EmployeeInfo> employeeInfos = LogMgr.Load_EmployeeInfo(SettingQActivity.this);
+        EmpInfoAdapter adapter = new EmpInfoAdapter(SettingQActivity.this, employeeInfos, new EmpInfoAdapter.onEmpInfoListener() {
+            @Override
+            public void onSelectedItem(EmployeeInfo employeeInfo, int position) {
+                LayoutInflater inflater = LayoutInflater.from(SettingQActivity.this);
+                final View DtEmpView = inflater.inflate(R.layout.layout_detail_employee,null);
+                final AlertDialog dialog = new AlertDialog.Builder(SettingQActivity.this).create();
+                dialog.setView(DtEmpView);
+                dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                dialog.setCancelable(false);
+                final ImageView btn_dt_emp_close = DtEmpView.findViewById(R.id.btn_dt_emp_close);
+                btn_dt_emp_close.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dialog.dismiss();
+                    }
+                });
+
+                final TextView txt_dt_id = (TextView)DtEmpView.findViewById(R.id.txt_dt_id);
+                txt_dt_id.setText(employeeInfo.getId());
+                final TextView txt_dt_code = (TextView)DtEmpView.findViewById(R.id.txt_dt_code);
+                txt_dt_code.setText(employeeInfo.getCode());
+                final TextView txt_dt_name = (TextView)DtEmpView.findViewById(R.id.txt_dt_name);
+                txt_dt_name.setText(employeeInfo.getName());
+                final TextView txt_dt_initials = (TextView)DtEmpView.findViewById(R.id.txt_dt_initials);
+                txt_dt_initials.setText(employeeInfo.getInitials());
+                final TextView txt_dt_company = (TextView)DtEmpView.findViewById(R.id.txt_dt_company);
+                txt_dt_company.setText(employeeInfo.getCompany());
+                final TextView txt_dt_department = (TextView)DtEmpView.findViewById(R.id.txt_dt_department);
+                txt_dt_department.setText(employeeInfo.getDepartment());
+                final TextView txt_dt_division = (TextView)DtEmpView.findViewById(R.id.txt_dt_division);
+                txt_dt_division.setText(employeeInfo.getDivision());
+                final TextView txt_dt_phone = (TextView)DtEmpView.findViewById(R.id.txt_dt_phone);
+                txt_dt_phone.setText(employeeInfo.getTelephone());
+                final TextView txt_dt_title = (TextView)DtEmpView.findViewById(R.id.txt_dt_title);
+                txt_dt_title.setText(employeeInfo.getTitle());
+                final TextView txt_dt_address = (TextView)DtEmpView.findViewById(R.id.txt_dt_address);
+                txt_dt_address.setText(employeeInfo.getAddress1());
+
+                dialog.show();
+            }
+        });
+        layoutManager = new LinearLayoutManager(this); //new GridLayoutManager(this,2);
+        RC_EmpInfo.setLayoutManager(layoutManager);
+        RC_EmpInfo.setAdapter(adapter);
+
+        //Branch Info
+        txt_branch_id.setText("Branch ID : " + GData.Branch_ID.toString());
+        List<BranchInfo> branchInfoList = LogMgr.Load_BranchInfo(SettingQActivity.this);
+        if(branchInfoList != null && branchInfoList.size() > 0)
+        {
+            //txt_branch_code.setText();
+        }
+    }
+    private void CallAPI()
+    {
+        //EmployeeInfo
+        String searchEmp = "{'branch_id' : '" + GData.Branch_ID + "'}";
+        new QcontrollerApi().RequestEmployeeInfoDetail(searchEmp, new QcontrollerApi.EmployeeInfoDetailListener() {
+            @Override
+            public void onEmployeeInfoResult(List<EmployeeInfo> info, Integer http_code) {
+                if (http_code == 200) {
+                    LogMgr.Save_EmployeeInfo(SettingQActivity.this,info);
+                }
+            }
+        });
+
+        //DivInfo
+        String searchDiv = "{BRANCH_ID:" + GData.Branch_ID.toString() + "}";
+        new QcontrollerApi().RequestBranchInfoDetail(searchDiv, new QcontrollerApi.BranchInfoDetailListener() {
+            @Override
+            public void onBranchInfoResult(List<BranchInfo> info, Integer http_code) {
+                EventBus.getDefault().post(new DebugMessageEvent("BranchInfo http_code="+http_code));
+                if(info!=null) {
+                    LogMgr.Save_BranchInfo(SettingQActivity.this,info);
+                }
+            }
+        });
+
+        RefreshData();
     }
 
     private void ChangePage(MyPage page) {
