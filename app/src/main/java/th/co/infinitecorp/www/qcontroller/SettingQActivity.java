@@ -26,14 +26,17 @@ import android.widget.Toast;
 import org.greenrobot.eventbus.EventBus;
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 import th.co.infinitecorp.www.qcontroller.ADAPTER.EmpInfoAdapter;
+import th.co.infinitecorp.www.qcontroller.ADAPTER.GroupInfoAdapter;
 import th.co.infinitecorp.www.qcontroller.API.QcontrollerApi;
 import th.co.infinitecorp.www.qcontroller.DataInfo.MASTER.BranchInfo;
 import th.co.infinitecorp.www.qcontroller.DataInfo.MASTER.DivInfo;
 import th.co.infinitecorp.www.qcontroller.DataInfo.MASTER.EmployeeInfo;
+import th.co.infinitecorp.www.qcontroller.DataInfo.MASTER.GrpInfo;
 import th.co.infinitecorp.www.qcontroller.EventBus.DebugMessageEvent;
 import th.co.infinitecorp.www.qcontroller.Management.LogMgr;
 import th.co.infinitecorp.www.qcontroller.Management.Setting_System;
@@ -43,15 +46,18 @@ public class SettingQActivity extends AppCompatActivity {
 
     private LinearLayout lt_Main, lt_Setting, lt_QDisplay;
     private LinearLayout lt_Setting_System, lt_Setting_User, lt_Setting_Profile, lt_Setting_Branch, lt_Setting_Resource;
-    private LinearLayout lt_Setting_System_Server, lt_Setting_System_Branch;
+    private LinearLayout lt_Setting_System_Server, lt_Setting_System_Branch,lt_Setting_Group,lt_Setting_Div,lt_Setting_Station,lt_Setting_DivMap;
     private Switch switch_mode;
     private TextView txt_system_server, txt_system_branchid,txt_branch_id,txt_branch_code,txt_branch_name,txt_branch_IP,txt_branch_open,txt_branch_close;
 
-    private Button btn_setting, btn_QDisplay, btn_Setting_System, btn_Setting_User, btn_Setting_Profile, btn_Setting_Branch, btn_Setting_Resource, btn_save_system,btn_save_branch,btn_branch_open,btn_branch_close;
-    private Button btn_bk_setting, btn_bk_setting_system, btn_home_setting_system,btn_bk_user,btn_user_addEmp,btn_home_user,btn_bk_setting_branch,btn_home_branch;
 
-    RecyclerView.LayoutManager layoutManager;
-    RecyclerView RC_EmpInfo;
+    private Button btn_setting, btn_QDisplay, btn_Setting_System, btn_Setting_User, btn_Setting_Profile, btn_Setting_Branch, btn_Setting_Resource, btn_save_system,btn_save_branch,btn_branch_open,btn_branch_close;
+    private Button btn_bk_setting, btn_bk_setting_system, btn_home_setting_system,btn_bk_user,btn_user_addEmp,btn_home_user,btn_bk_setting_branch,btn_home_branch,btn_bk_profile,btn_home_profile;
+    private Button btn_bk_group,btn_home_group,btn_add_group;
+    private Button btn_group,btn_div,btn_station,btn_divmap;
+
+    RecyclerView.LayoutManager layoutManagerEmp,layoutManagerGrp;
+    RecyclerView RC_EmpInfo,RC_GroupInfo;
 
 
     private static enum MyPage {
@@ -62,7 +68,11 @@ public class SettingQActivity extends AppCompatActivity {
         User,
         Profile,
         Branch,
-        Resource
+        Resource,
+        Group,
+        Division,
+        Station,
+        Division_Map
     }
 
     @Override
@@ -74,19 +84,25 @@ public class SettingQActivity extends AppCompatActivity {
         {
             CallAPI();
             btn_user_addEmp.setVisibility(View.GONE);
+            btn_add_group.setVisibility(View.GONE);
             lt_Setting_System_Server.setVisibility(View.VISIBLE);
             lt_Setting_System_Branch.setVisibility(View.VISIBLE);
         }else
         {
             btn_user_addEmp.setVisibility(View.VISIBLE);
+            btn_add_group.setVisibility(View.VISIBLE);
             lt_Setting_System_Server.setVisibility(View.GONE);
             lt_Setting_System_Branch.setVisibility(View.GONE);
         }
-        RefreshData();
+        RefreshDataEmp();
+        RefreshDataBranch();
+        RefreshGroup();
         ChangePage(MyPage.Main);
     }
 
     private void ConnectView() {
+
+        //region LinearLayout
         lt_Main = (LinearLayout) findViewById(R.id.lt_Main);
         lt_Setting = (LinearLayout) findViewById(R.id.lt_Setting);
         lt_QDisplay = (LinearLayout) findViewById(R.id.lt_QDisplay);
@@ -99,28 +115,13 @@ public class SettingQActivity extends AppCompatActivity {
         lt_Setting_System_Server = (LinearLayout) findViewById(R.id.lt_Setting_System_Server);
         lt_Setting_System_Branch = (LinearLayout) findViewById(R.id.lt_Setting_System_Branch);
 
-        txt_system_server = (TextView) findViewById(R.id.txt_system_server);
-        txt_system_server.setText(GData.TARGET_SERVER);
-        txt_system_branchid = (TextView) findViewById(R.id.txt_system_branchid);
-        txt_system_branchid.setText(GData.Branch_ID.toString());
+        lt_Setting_Group = (LinearLayout) findViewById(R.id.lt_Setting_Group);
+        lt_Setting_Div = (LinearLayout) findViewById(R.id.lt_Setting_Div);
+        lt_Setting_Station = (LinearLayout) findViewById(R.id.lt_Setting_Station);
+        lt_Setting_DivMap = (LinearLayout) findViewById(R.id.lt_Setting_DivMap);
+        //endregion
 
-        RC_EmpInfo = (RecyclerView)findViewById(R.id.RC_EmpInfo);
-
-        switch_mode = (Switch) findViewById(R.id.switch_mode);
-        switch_mode.setChecked(GData.ONLINE_MODE);
-        switch_mode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if (!b) {
-                    lt_Setting_System_Server.setVisibility(View.GONE);
-                    lt_Setting_System_Branch.setVisibility(View.GONE);
-                } else {
-                    lt_Setting_System_Server.setVisibility(View.VISIBLE);
-                    lt_Setting_System_Branch.setVisibility(View.VISIBLE);
-                }
-            }
-        });
-
+        //region Main
         btn_setting = (Button) findViewById(R.id.btn_Setting);
         btn_setting.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -137,6 +138,9 @@ public class SettingQActivity extends AppCompatActivity {
                 ChangePage(MyPage.QDisplay);
             }
         });
+        //endregion
+
+        //region Setting
         btn_Setting_System = (Button) findViewById(R.id.btn_Setting_System);
         btn_Setting_System.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -179,6 +183,27 @@ public class SettingQActivity extends AppCompatActivity {
                 ChangePage(MyPage.Main);
             }
         });
+        //endregion
+
+        //region System
+        txt_system_server = (TextView) findViewById(R.id.txt_system_server);
+        txt_system_server.setText(GData.TARGET_SERVER);
+        txt_system_branchid = (TextView) findViewById(R.id.txt_system_branchid);
+        txt_system_branchid.setText(GData.Branch_ID.toString());
+        switch_mode = (Switch) findViewById(R.id.switch_mode);
+        switch_mode.setChecked(GData.ONLINE_MODE);
+        switch_mode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (!b) {
+                    lt_Setting_System_Server.setVisibility(View.GONE);
+                    lt_Setting_System_Branch.setVisibility(View.GONE);
+                } else {
+                    lt_Setting_System_Server.setVisibility(View.VISIBLE);
+                    lt_Setting_System_Branch.setVisibility(View.VISIBLE);
+                }
+            }
+        });
         btn_bk_setting_system = (Button) findViewById(R.id.btn_bk_setting_system);
         btn_bk_setting_system.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -192,13 +217,6 @@ public class SettingQActivity extends AppCompatActivity {
             public void onClick(View view) {
                 ChangePage(MyPage.Main);
                 String aa = "";
-            }
-        });
-        btn_bk_user = (Button)findViewById(R.id.btn_bk_user);
-        btn_bk_user.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ChangePage(MyPage.Setting);
             }
         });
         btn_save_system = (Button) findViewById(R.id.btn_save_system);
@@ -237,15 +255,29 @@ public class SettingQActivity extends AppCompatActivity {
                 {
                     CallAPI();
                     btn_user_addEmp.setVisibility(View.GONE);
+                    btn_add_group.setVisibility(View.GONE);
                 }else
                 {
                     btn_user_addEmp.setVisibility(View.VISIBLE);
+                    btn_add_group.setVisibility(View.VISIBLE);
                     LogMgr.Delete_EmployeeInfo(SettingQActivity.this);
+                    LogMgr.Delete_GrpInfo(SettingQActivity.this);
+                    RefreshDataEmp();
+                    RefreshGroup();
                 }
-                RefreshData();
             }
         });
+        //endregion
 
+        //region EmployeeInfo
+        RC_EmpInfo = (RecyclerView)findViewById(R.id.RC_EmpInfo);
+        btn_bk_user = (Button)findViewById(R.id.btn_bk_user);
+        btn_bk_user.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ChangePage(MyPage.Setting);
+            }
+        });
         btn_home_user = (Button)findViewById(R.id.btn_home_user);
         btn_home_user.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -348,7 +380,8 @@ public class SettingQActivity extends AppCompatActivity {
                             if(LogMgr.Save_EmployeeInfo(SettingQActivity.this,empInfoList))
                             {
                                 Toast.makeText(SettingQActivity.this,"บันทึกข้อมูลพนักงานสำเร็จ",Toast.LENGTH_LONG).show();
-                                RefreshData();
+                                RefreshDataEmp();
+                                RefreshDataBranch();
                                 dialog.dismiss();
                             }else
                                 {
@@ -362,7 +395,9 @@ public class SettingQActivity extends AppCompatActivity {
                 dialog.show();
             }
         });
+        //endregion
 
+        //region Branch Info
         btn_bk_setting_branch = (Button)findViewById(R.id.btn_bk_setting_branch);
         btn_bk_setting_branch.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -424,17 +459,184 @@ public class SettingQActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String ip = txt_branch_IP.getText().toString();
+                String code = txt_branch_code.getText().toString();
+                String name = txt_branch_name.getText().toString();
+                String openTime = txt_branch_open.getText().toString();
+                String closeTime = txt_branch_close.getText().toString();
+
                 if(ip.equals(""))
                 {
                     Toast.makeText(SettingQActivity.this,"กรุณากรอก IP",Toast.LENGTH_LONG).show();
                     return;
                 }
+                if(!validIP(ip))
+                {
+                    Toast.makeText(SettingQActivity.this,"รูปแบบ IP ไม่ถูกต้อง (xxx.xxx.xxx.xxx)",Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                List<BranchInfo> branchInfoArrayList = new ArrayList<>();
+                List<BranchInfo> branchInfoList = LogMgr.Load_BranchInfo(SettingQActivity.this);
+                if(branchInfoList != null && branchInfoList.size() > 0)
+                {
+                    BranchInfo branchInfo = branchInfoList.get(0);
+                    branchInfo.setCode(code);
+                    branchInfo.setName(name);
+                    branchInfo.setIPAddress(ip);
+                    branchInfo.setOpen(openTime);
+                    branchInfo.setClose(closeTime);
+                    branchInfoArrayList.add(branchInfo);
+                }
+                LogMgr.Save_BranchInfo(SettingQActivity.this ,branchInfoArrayList );
+
+            }
+        });
+        //endregion
+
+        //region Profile
+        btn_bk_profile = (Button)findViewById(R.id.btn_bk_profile);
+        btn_bk_profile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ChangePage(MyPage.Setting);
+            }
+        });
+        btn_home_profile = (Button)findViewById(R.id.btn_home_profile);
+        btn_home_profile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ChangePage(MyPage.Main);
             }
         });
 
+        btn_group = (Button)findViewById(R.id.btn_group);
+        btn_group.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ChangePage(MyPage.Group);
+            }
+        });
+        btn_div = (Button)findViewById(R.id.btn_div);
+        btn_div.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ChangePage(MyPage.Division);
+            }
+        });
+        btn_station = (Button)findViewById(R.id.btn_station);
+        btn_station.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ChangePage(MyPage.Station);
+            }
+        });
+        btn_divmap = (Button)findViewById(R.id.btn_divmap);
+        btn_divmap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ChangePage(MyPage.Division_Map);
+            }
+        });
+        //endregion
+
+        //region Setting Group
+        RC_GroupInfo = (RecyclerView)findViewById(R.id.RC_GroupInfo);
+        btn_bk_group = (Button)findViewById(R.id.btn_bk_group);
+        btn_bk_group.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ChangePage(MyPage.Profile);
+            }
+        });
+        btn_home_group = (Button)findViewById(R.id.btn_home_group);
+        btn_home_group.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ChangePage(MyPage.Main);
+            }
+        });
+        btn_add_group =(Button) findViewById(R.id.btn_add_group);
+        btn_add_group.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LayoutInflater inflater = LayoutInflater.from(SettingQActivity.this);
+                final View addGroupView = inflater.inflate(R.layout.layout_add_group,null);
+                final AlertDialog dialog = new AlertDialog.Builder(SettingQActivity.this).create();
+                dialog.setView(addGroupView);
+                dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                dialog.setCancelable(false);
+                final ImageView btn_dt_group_close = addGroupView.findViewById(R.id.btn_dt_group_close);
+                btn_dt_group_close.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dialog.dismiss();
+                    }
+                });
+                final TextView txt_group_id = addGroupView.findViewById(R.id.txt_group_id);
+                final TextView  txt_group_name = addGroupView.findViewById(R.id.txt_group_name);
+                final TextView  txt_group_detail = addGroupView.findViewById(R.id.txt_group_detail);
+                final TextView  btn_save_group = addGroupView.findViewById(R.id.btn_save_group);
+                btn_save_group.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        String id = txt_group_id.getText().toString();
+                        String name = txt_group_name.getText().toString();
+                        String detail = txt_group_detail.getText().toString();
+                        int ID = -1;
+                        if(id.equals(""))
+                        {
+                            Toast.makeText(SettingQActivity.this,"กรุณากรอก Group ID",Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        else
+                        {
+                            List<GrpInfo> grpInfos = LogMgr.Load_GrpInfo(SettingQActivity.this);
+                            if(grpInfos != null && grpInfos.size() > 0)
+                            {
+                                for(GrpInfo data : grpInfos)
+                                {
+                                    if(data.getID().equals(id))
+                                    {
+                                        Toast.makeText(SettingQActivity.this,"ID นี้มีการใช้งานอยู่ฝนระบบแล้ว",Toast.LENGTH_LONG).show();
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                        try
+                        {
+                            ID = Integer.parseInt(id);
+                        }catch (Exception ex)
+                        {
+                            Toast.makeText(SettingQActivity.this,"ID ต้องเป็นตัวเลขเท่านั้น",Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        if(name.equals(""))
+                        {
+                            Toast.makeText(SettingQActivity.this,"กรุณากรอกชื่อ Group",Toast.LENGTH_LONG).show();
+                            return;
+                        }
+
+                        List<GrpInfo> grpInfos = LogMgr.Load_GrpInfo(SettingQActivity.this);
+                        GrpInfo grpInfo = new GrpInfo(GData.Branch_ID,ID,name,detail);
+                        grpInfos.add(grpInfo);
+                        if(LogMgr.Save_GrpInfo(SettingQActivity.this,grpInfos))
+                        {
+                            Toast.makeText(SettingQActivity.this,"บันทึกข้อมูลสำเร็จ",Toast.LENGTH_LONG).show();
+                            RefreshGroup();
+                        }else
+                        {
+                            Toast.makeText(SettingQActivity.this,"บันทึกข้อมูลไม่สำเร็จ",Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+                dialog.show();
+            }
+        });
+        //endregion
     }
 
-    private void RefreshData()
+    private void RefreshDataEmp()
     {
         //EmployeeInfo
         List<EmployeeInfo> employeeInfos = LogMgr.Load_EmployeeInfo(SettingQActivity.this);
@@ -454,7 +656,6 @@ public class SettingQActivity extends AppCompatActivity {
                         dialog.dismiss();
                     }
                 });
-
                 final TextView txt_dt_id = (TextView)DtEmpView.findViewById(R.id.txt_dt_id);
                 txt_dt_id.setText(employeeInfo.getId());
                 final TextView txt_dt_code = (TextView)DtEmpView.findViewById(R.id.txt_dt_code);
@@ -475,48 +676,115 @@ public class SettingQActivity extends AppCompatActivity {
                 txt_dt_title.setText(employeeInfo.getTitle());
                 final TextView txt_dt_address = (TextView)DtEmpView.findViewById(R.id.txt_dt_address);
                 txt_dt_address.setText(employeeInfo.getAddress1());
-
                 dialog.show();
             }
         });
-        layoutManager = new LinearLayoutManager(this); //new GridLayoutManager(this,2);
-        RC_EmpInfo.setLayoutManager(layoutManager);
+        layoutManagerEmp = new LinearLayoutManager(this); //new GridLayoutManager(this,2);
+        RC_EmpInfo.setLayoutManager(layoutManagerEmp);
         RC_EmpInfo.setAdapter(adapter);
-
+    }
+    private void RefreshDataBranch()
+    {
         //Branch Info
         txt_branch_id.setText("Branch ID : " + GData.Branch_ID.toString());
         List<BranchInfo> branchInfoList = LogMgr.Load_BranchInfo(SettingQActivity.this);
         if(branchInfoList != null && branchInfoList.size() > 0)
         {
-            //txt_branch_code.setText();
+            BranchInfo branchInfo = branchInfoList.get(0);
+            txt_branch_code.setText(branchInfo.getCode().trim());
+            txt_branch_name.setText(branchInfo.getName());
+            txt_branch_IP.setText(branchInfo.getIPAddress());
+            txt_branch_open.setText(branchInfo.getOpen());
+            txt_branch_close.setText(branchInfo.getClose());
         }
+    }
+    private void RefreshGroup()
+    {
+        List<GrpInfo> grpInfoList = LogMgr.Load_GrpInfo(SettingQActivity.this);
+        GroupInfoAdapter adapter = new GroupInfoAdapter(SettingQActivity.this, grpInfoList, new GroupInfoAdapter.onGrpInfoListener() {
+            @Override
+            public void onSelectedItem(GrpInfo grpInfo, int position) {
+
+            }
+        });
+        layoutManagerGrp = new LinearLayoutManager(this);
+        RC_GroupInfo.setLayoutManager(layoutManagerGrp);
+        RC_GroupInfo.setAdapter(adapter);
     }
     private void CallAPI()
     {
-        //EmployeeInfo
+        //region ApiEmployeeInfo
         String searchEmp = "{'branch_id' : '" + GData.Branch_ID + "'}";
         new QcontrollerApi().RequestEmployeeInfoDetail(searchEmp, new QcontrollerApi.EmployeeInfoDetailListener() {
             @Override
             public void onEmployeeInfoResult(List<EmployeeInfo> info, Integer http_code) {
+                EventBus.getDefault().post(new DebugMessageEvent("EmployeeInfo http_code="+http_code));
                 if (http_code == 200) {
                     LogMgr.Save_EmployeeInfo(SettingQActivity.this,info);
+                    RefreshDataEmp();
+
                 }
+                GData.callAPI_Index++;
             }
         });
+        //endregion
 
-        //DivInfo
-        String searchDiv = "{BRANCH_ID:" + GData.Branch_ID.toString() + "}";
+        //region ApiDivInfo
+        String searchDiv = "{'ID':" + GData.Branch_ID.toString() + "}";
         new QcontrollerApi().RequestBranchInfoDetail(searchDiv, new QcontrollerApi.BranchInfoDetailListener() {
             @Override
             public void onBranchInfoResult(List<BranchInfo> info, Integer http_code) {
                 EventBus.getDefault().post(new DebugMessageEvent("BranchInfo http_code="+http_code));
                 if(info!=null) {
                     LogMgr.Save_BranchInfo(SettingQActivity.this,info);
+                    RefreshDataBranch();
                 }
+                GData.callAPI_Index++;
             }
         });
+        //endregion
 
-        RefreshData();
+        //region Group Info
+        new  QcontrollerApi().RequestGrpInfoDetail("{branch_id:" + GData.Branch_ID.toString() + "}", new QcontrollerApi.GrpInfoDetailListener() {
+            @Override
+            public void onGrpInfoResult(List<GrpInfo> info, Integer http_code) {
+                EventBus.getDefault().post(new DebugMessageEvent("GrpInfo http_code="+http_code));
+                if(info!=null) {
+                    LogMgr.Save_GrpInfo(SettingQActivity.this,info);
+                    RefreshGroup();
+                }
+                GData.callAPI_Index++;
+            }
+        });
+        //endregion
+
+    }
+
+    private boolean validIP (String ip) {
+        try {
+            if ( ip == null || ip.isEmpty() ) {
+                return false;
+            }
+
+            String[] parts = ip.split( "\\." );
+            if ( parts.length != 4 ) {
+                return false;
+            }
+
+            for ( String s : parts ) {
+                int i = Integer.parseInt( s );
+                if ( (i < 0) || (i > 255) ) {
+                    return false;
+                }
+            }
+            if ( ip.endsWith(".") ) {
+                return false;
+            }
+
+            return true;
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
     }
 
     private void ChangePage(MyPage page) {
@@ -556,9 +824,20 @@ public class SettingQActivity extends AppCompatActivity {
                 lt_Setting_Branch.setVisibility(View.VISIBLE);
                 break;
             }
+            case Group: {
+                lt_Setting_Group.setVisibility(View.VISIBLE);
+            }
+            case Division: {
+                lt_Setting_Div.setVisibility(View.VISIBLE);
+            }
+            case Division_Map: {
+                lt_Setting_DivMap.setVisibility(View.VISIBLE);
+            }
+            case Station: {
+                lt_Setting_Station.setVisibility(View.VISIBLE);
+            }
         }
     }
-
     private void SetHidePage() {
         for (MyPage p : MyPage.values()) {
             switch (p) {
@@ -593,6 +872,18 @@ public class SettingQActivity extends AppCompatActivity {
                 case Branch: {
                     lt_Setting_Branch.setVisibility(View.GONE);
                     break;
+                }
+                case Group: {
+                    lt_Setting_Group.setVisibility(View.GONE);
+                }
+                case Division: {
+                    lt_Setting_Div.setVisibility(View.GONE);
+                }
+                case Division_Map: {
+                    lt_Setting_DivMap.setVisibility(View.GONE);
+                }
+                case Station: {
+                    lt_Setting_Station.setVisibility(View.GONE);
                 }
             }
         }

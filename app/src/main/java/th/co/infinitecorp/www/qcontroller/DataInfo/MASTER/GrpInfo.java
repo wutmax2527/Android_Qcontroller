@@ -25,7 +25,14 @@ public class GrpInfo {
 
     }
 
-     public Integer getBranch_ID() {
+    public GrpInfo(Integer branch_ID, Integer ID, String name, String desc) {
+        this.Branch_ID = branch_ID;
+        this.ID = ID;
+        this.Name = name;
+        this.Desc = desc;
+    }
+
+    public Integer getBranch_ID() {
           return Branch_ID;
      }
 

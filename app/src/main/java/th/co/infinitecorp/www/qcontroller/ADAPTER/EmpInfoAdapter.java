@@ -8,10 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-
 import java.util.List;
-
 import th.co.infinitecorp.www.qcontroller.DataInfo.MASTER.EmployeeInfo;
 import th.co.infinitecorp.www.qcontroller.R;
 

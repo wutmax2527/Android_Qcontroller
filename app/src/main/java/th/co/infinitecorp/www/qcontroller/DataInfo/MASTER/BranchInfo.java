@@ -58,6 +58,17 @@ public class BranchInfo {
 
     }
 
+    public BranchInfo(Integer ID, String name, String code, String open, String close, String IPAddress, String dayBegin, String dayEnd) {
+        this.ID = ID;
+        this.Name = name;
+        this.Code = code;
+        this.Open = open;
+        this.Close = close;
+        this.DayBegin = dayBegin;
+        this.DayEnd = dayEnd;
+        this.IPAddress = IPAddress;
+    }
+
     public Integer getID() {
         return ID;
     }
