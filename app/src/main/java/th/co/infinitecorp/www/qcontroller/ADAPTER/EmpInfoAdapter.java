@@ -45,7 +45,6 @@ public class EmpInfoAdapter extends RecyclerView.Adapter<EmpInfoAdapter.EmpItemH
         EmployeeInfo info = employeeInfos.get(position);
         holder.lb_emp_code.setText(info.getCode());
         holder.lb_emp_name.setText(info.getName());
-
     }
 
     @Override

@@ -37,6 +37,7 @@ import th.co.infinitecorp.www.qcontroller.DataInfo.MASTER.BranchInfo;
 import th.co.infinitecorp.www.qcontroller.DataInfo.MASTER.DivInfo;
 import th.co.infinitecorp.www.qcontroller.DataInfo.MASTER.EmployeeInfo;
 import th.co.infinitecorp.www.qcontroller.DataInfo.MASTER.GrpInfo;
+import th.co.infinitecorp.www.qcontroller.DataInfo.MASTER.StaInfo;
 import th.co.infinitecorp.www.qcontroller.EventBus.DebugMessageEvent;
 import th.co.infinitecorp.www.qcontroller.Management.LogMgr;
 import th.co.infinitecorp.www.qcontroller.Management.Setting_System;
@@ -53,11 +54,11 @@ public class SettingQActivity extends AppCompatActivity {
 
     private Button btn_setting, btn_QDisplay, btn_Setting_System, btn_Setting_User, btn_Setting_Profile, btn_Setting_Branch, btn_Setting_Resource, btn_save_system,btn_save_branch,btn_branch_open,btn_branch_close;
     private Button btn_bk_setting, btn_bk_setting_system, btn_home_setting_system,btn_bk_user,btn_user_addEmp,btn_home_user,btn_bk_setting_branch,btn_home_branch,btn_bk_profile,btn_home_profile;
-    private Button btn_bk_group,btn_home_group,btn_add_group;
+    private Button btn_bk_group,btn_home_group,btn_add_group,btn_bk_station,btn_home_station,btn_add_station;
     private Button btn_group,btn_div,btn_station,btn_divmap;
 
     RecyclerView.LayoutManager layoutManagerEmp,layoutManagerGrp;
-    RecyclerView RC_EmpInfo,RC_GroupInfo;
+    RecyclerView RC_EmpInfo,RC_GroupInfo,RC_Stainfo;
 
 
     private static enum MyPage {
@@ -634,6 +635,37 @@ public class SettingQActivity extends AppCompatActivity {
             }
         });
         //endregion
+
+        //region Setting Divinfo
+        //endregion
+
+        //region Setting Stainfo
+        RC_Stainfo = (RecyclerView)findViewById(R.id.RC_Stainfo);
+        btn_bk_station = (Button)findViewById(R.id.btn_bk_station);
+        btn_bk_station.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ChangePage(MyPage.Profile);
+            }
+        });
+        btn_home_station = (Button)findViewById(R.id.btn_home_station);
+        btn_home_station.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ChangePage(MyPage.Main);
+            }
+        });
+        btn_add_station = (Button)findViewById(R.id.btn_add_station);
+        btn_add_station.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+        //endregion
+
+        //region Setting Div Map Group
+        //endregion
     }
 
     private void RefreshDataEmp()
@@ -711,6 +743,12 @@ public class SettingQActivity extends AppCompatActivity {
         RC_GroupInfo.setLayoutManager(layoutManagerGrp);
         RC_GroupInfo.setAdapter(adapter);
     }
+    private void RefreshStation()
+    {
+        List<StaInfo> staInfos = LogMgr.Load_StaInfo(SettingQActivity.this);
+
+    }
+
     private void CallAPI()
     {
         //region ApiEmployeeInfo
@@ -758,6 +796,19 @@ public class SettingQActivity extends AppCompatActivity {
         });
         //endregion
 
+        //region Station Info
+        new QcontrollerApi().RequestStaInfoDetail("{branch_id:" + GData.Branch_ID.toString() + "}", new QcontrollerApi.StaInfoDetailListener() {
+            @Override
+            public void onStaInfoResult(List<StaInfo> info, Integer http_code) {
+                EventBus.getDefault().post(new DebugMessageEvent("StaInfo http_code="+http_code));
+                if(info!=null) {
+                    LogMgr.Save_StaInfo(SettingQActivity.this,info);
+                    RefreshStation();
+                }
+                GData.callAPI_Index++;
+            }
+        });
+        //endregion
     }
 
     private boolean validIP (String ip) {
