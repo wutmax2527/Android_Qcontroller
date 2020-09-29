@@ -18,6 +18,20 @@ public class DivInfo {
 
     }
 
+    public DivInfo(Integer branch_ID, Integer ID, String name, String desc, Integer QStart, Integer QStop, Integer print_Coppies, String servtime_alert, Integer show, Integer seq, Integer showMobile) {
+        this.Branch_ID = branch_ID;
+        this.ID = ID;
+        this.Name = name;
+        this.Desc = desc;
+        this.QStart = QStart;
+        this.QStop = QStop;
+        this.Print_Coppies = print_Coppies;
+        this.servtime_alert = servtime_alert;
+        this.Show = show;
+        this.Seq = seq;
+        this.ShowMobile = showMobile;
+    }
+
     public Integer getBranch_ID() {
         return Branch_ID;
     }

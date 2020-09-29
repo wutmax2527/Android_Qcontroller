@@ -11,6 +11,13 @@ public class StaInfo {
 
     }
 
+    public StaInfo(Integer branch_ID, Integer ID, String name, Integer group_ID) {
+        Branch_ID = branch_ID;
+        this.ID = ID;
+        Name = name;
+        Group_ID = group_ID;
+    }
+
     public Integer getBranch_ID() {
         return Branch_ID;
     }

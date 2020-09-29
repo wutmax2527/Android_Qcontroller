@@ -33,8 +33,8 @@ public class EmpInfoAdapter extends RecyclerView.Adapter<EmpInfoAdapter.EmpItemH
     @NonNull
     @Override
     public EmpItemHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        //View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_cell_employee, parent, false);
-        View v = layoutInflater.inflate(R.layout.layout_cell_employee, parent, false);
+        //View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_cell_recycler, parent, false);
+        View v = layoutInflater.inflate(R.layout.layout_cell_recycler, parent, false);
         EmpItemHolder viewHolder = new EmpItemHolder(v);
         return viewHolder;
     }
@@ -59,8 +59,8 @@ public class EmpInfoAdapter extends RecyclerView.Adapter<EmpInfoAdapter.EmpItemH
         public EmpItemHolder(@NonNull View itemView) {
             super(itemView);
             container = (LinearLayout) itemView.findViewById(R.id.container);
-            lb_emp_code = (TextView) itemView.findViewById(R.id.lb_emp_code);
-            lb_emp_name = (TextView) itemView.findViewById(R.id.lb_emp_name);
+            lb_emp_code = (TextView) itemView.findViewById(R.id.lb_cell_code);
+            lb_emp_name = (TextView) itemView.findViewById(R.id.lb_cell_name);
         }
 
         public void bind(final EmployeeInfo item, final onEmpInfoListener listener,final int position) {

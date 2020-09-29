@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import th.co.infinitecorp.www.qcontroller.DataInfo.MASTER.EmployeeInfo;
 import th.co.infinitecorp.www.qcontroller.DataInfo.MASTER.GrpInfo;
 import th.co.infinitecorp.www.qcontroller.R;
 
@@ -33,7 +32,7 @@ public class GroupInfoAdapter extends RecyclerView.Adapter<GroupInfoAdapter.GrpI
 
     @Override
     public GrpItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = layoutInflater.inflate(R.layout.layout_cell_group, parent, false);
+        View v = layoutInflater.inflate(R.layout.layout_cell_recycler, parent, false);
         GrpItemHolder holder = new GrpItemHolder(v);
         return holder;
     }
@@ -57,8 +56,8 @@ public class GroupInfoAdapter extends RecyclerView.Adapter<GroupInfoAdapter.GrpI
         public GrpItemHolder(View itemView) {
             super(itemView);
             container = (LinearLayout) itemView.findViewById(R.id.container);
-            lb_grp_id = (TextView) itemView.findViewById(R.id.lb_grp_id);
-            lb_grp_name = (TextView) itemView.findViewById(R.id.lb_grp_name);
+            lb_grp_id = (TextView) itemView.findViewById(R.id.lb_cell_code);
+            lb_grp_name = (TextView) itemView.findViewById(R.id.lb_cell_name);
         }
 
         public void bind(final GrpInfo item, final GroupInfoAdapter.onGrpInfoListener listener, final int position) {
