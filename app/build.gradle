@@ -21,6 +21,13 @@ android {
             path file('CMakeLists.txt')
         }
     }
+    sourceSets {
+        main {
+            res {
+                srcDirs 'src/main/res', 'src/main/res/layouts/Setting/', 'src/main/res/layout/Setting'
+            }
+        }
+    }
 
     configurations.all {
         resolutionStrategy.eachDependency { DependencyResolveDetails details ->

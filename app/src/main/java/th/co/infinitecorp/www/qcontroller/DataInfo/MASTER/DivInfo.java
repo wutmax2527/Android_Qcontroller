@@ -18,7 +18,7 @@ public class DivInfo {
 
     }
 
-    public DivInfo(Integer branch_ID, Integer ID, String name, String desc, Integer QStart, Integer QStop, Integer print_Coppies, String servtime_alert, Integer show, Integer seq, Integer showMobile) {
+    public DivInfo(Integer branch_ID, Integer ID, String name, String desc, Integer QStart, Integer QStop, Integer print_Coppies, String servtime_alert, Integer seq,Integer show,  Integer showMobile) {
         this.Branch_ID = branch_ID;
         this.ID = ID;
         this.Name = name;

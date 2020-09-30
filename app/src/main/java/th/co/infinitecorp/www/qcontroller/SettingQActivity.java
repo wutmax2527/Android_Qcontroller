@@ -44,6 +44,7 @@ import th.co.infinitecorp.www.qcontroller.DataInfo.MASTER.DivInfo;
 import th.co.infinitecorp.www.qcontroller.DataInfo.MASTER.EmployeeInfo;
 import th.co.infinitecorp.www.qcontroller.DataInfo.MASTER.GrpInfo;
 import th.co.infinitecorp.www.qcontroller.DataInfo.MASTER.StaInfo;
+import th.co.infinitecorp.www.qcontroller.DataInfo.Mapping.DivMapGroupInfo;
 import th.co.infinitecorp.www.qcontroller.EventBus.DebugMessageEvent;
 import th.co.infinitecorp.www.qcontroller.Management.LogMgr;
 import th.co.infinitecorp.www.qcontroller.Management.Setting_System;
@@ -62,10 +63,10 @@ public class SettingQActivity extends AppCompatActivity {
     private Button btn_bk_setting, btn_bk_setting_system, btn_home_setting_system,btn_bk_user,btn_user_addEmp,btn_home_user,btn_bk_setting_branch,btn_home_branch,btn_bk_profile,btn_home_profile;
     private Button btn_bk_group,btn_home_group,btn_add_group,btn_bk_station,btn_home_station,btn_add_station,btn_add_div;
     private Button btn_group,btn_div,btn_station,btn_divmap;
-    private Button btn_bk_div,btn_home_div,btn_bk_div_map,btn_home_div_map;
+    private Button btn_bk_div,btn_home_div,btn_bk_div_map,btn_home_div_map,btn_add_div_map;
 
-    RecyclerView.LayoutManager layoutManagerEmp,layoutManagerGrp,layoutManagerSta,layoutManagerDiv;
-    RecyclerView RC_EmpInfo,RC_GroupInfo,RC_Stainfo,RC_Divinfo;
+    RecyclerView.LayoutManager layoutManagerEmp,layoutManagerGrp,layoutManagerSta,layoutManagerDiv,layoutManagerDivMap;
+    RecyclerView RC_EmpInfo,RC_GroupInfo,RC_Stainfo,RC_Divinfo,RC_DivMap;
 
     private static enum MyPage {
         Main,
@@ -93,6 +94,7 @@ public class SettingQActivity extends AppCompatActivity {
             btn_user_addEmp.setVisibility(View.GONE);
             btn_add_group.setVisibility(View.GONE);
             btn_add_station.setVisibility(View.GONE);
+            btn_add_div.setVisibility(View.GONE);
             lt_Setting_System_Server.setVisibility(View.VISIBLE);
             lt_Setting_System_Branch.setVisibility(View.VISIBLE);
         }else
@@ -100,11 +102,13 @@ public class SettingQActivity extends AppCompatActivity {
             btn_user_addEmp.setVisibility(View.VISIBLE);
             btn_add_group.setVisibility(View.VISIBLE);
             btn_add_station.setVisibility(View.VISIBLE);
+            btn_add_div.setVisibility(View.VISIBLE);
             lt_Setting_System_Server.setVisibility(View.GONE);
             lt_Setting_System_Branch.setVisibility(View.GONE);
             LogMgr.Delete_EmployeeInfo(SettingQActivity.this);
             LogMgr.Delete_GrpInfo(SettingQActivity.this);
             LogMgr.Delete_StaInfo(SettingQActivity.this);
+            LogMgr.Delete_DivInfo(SettingQActivity.this);
             RefreshDataEmp();
             RefreshGroup();
             RefreshStation();
@@ -274,14 +278,17 @@ public class SettingQActivity extends AppCompatActivity {
                     btn_user_addEmp.setVisibility(View.GONE);
                     btn_add_group.setVisibility(View.GONE);
                     btn_add_station.setVisibility(View.GONE);
+                    btn_add_div.setVisibility(View.GONE);
                 }else
                 {
                     btn_user_addEmp.setVisibility(View.VISIBLE);
                     btn_add_group.setVisibility(View.VISIBLE);
                     btn_add_station.setVisibility(View.VISIBLE);
+                    btn_add_div.setVisibility(View.VISIBLE);
                     LogMgr.Delete_EmployeeInfo(SettingQActivity.this);
                     LogMgr.Delete_GrpInfo(SettingQActivity.this);
                     LogMgr.Delete_StaInfo(SettingQActivity.this);
+                    LogMgr.Delete_DivInfo(SettingQActivity.this);
                     RefreshDataEmp();
                     RefreshGroup();
                     RefreshStation();
@@ -674,7 +681,122 @@ public class SettingQActivity extends AppCompatActivity {
             }
         });
         RC_Divinfo = (RecyclerView)findViewById(R.id.RC_Divinfo);
+        btn_add_div = (Button)findViewById(R.id.btn_add_div);
+        btn_add_div.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LayoutInflater inflater = LayoutInflater.from(SettingQActivity.this);
+                final View addDivView = inflater.inflate(R.layout.layout_add_div,null);
+                final AlertDialog dialog = new AlertDialog.Builder(SettingQActivity.this).create();
+                dialog.setView(addDivView);
+                dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                dialog.setCancelable(false);
+                final ImageView btn_dt_div_close = addDivView.findViewById(R.id.btn_dt_div_close);
+                btn_dt_div_close.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) { dialog.dismiss(); }});
+                final TextView txt_div_id = addDivView.findViewById(R.id.txt_div_id);
+                txt_div_id.setTransformationMethod(null);
+                final TextView txt_div_name = addDivView.findViewById(R.id.txt_div_name);
+                final TextView txt_div_desc = addDivView.findViewById(R.id.txt_div_desc);
+                final TextView txt_div_qstart = addDivView.findViewById(R.id.txt_div_qstart);
+                txt_div_qstart.setTransformationMethod(null);
+                final TextView txt_div_qend = addDivView.findViewById(R.id.txt_div_qend);
+                txt_div_qend.setTransformationMethod(null);
+                final TextView txt_div_copy = addDivView.findViewById(R.id.txt_div_copy);
+                txt_div_copy.setTransformationMethod(null);
+                final TextView txt_div_alert = addDivView.findViewById(R.id.txt_div_alert);
+                txt_div_alert.setTransformationMethod(null);
+                final TextView txt_div_seq = addDivView.findViewById(R.id.txt_div_seq);
+                txt_div_seq.setTransformationMethod(null);
 
+                final Button btn_save_div = addDivView.findViewById(R.id.btn_save_div);
+                btn_save_div.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        String txt_id = txt_div_id.getText().toString();
+                        String name = txt_div_name.getText().toString();
+                        String desc = txt_div_desc.getText().toString();
+                        String txt_qstart = txt_div_qstart.getText().toString();
+                        String txt_qend = txt_div_qend.getText().toString();
+                        String txt_copy = txt_div_copy.getText().toString();
+                        String alert = txt_div_alert.getText().toString();
+                        String txt_seq = txt_div_seq.getText().toString();
+                        Integer id = 0;
+                        Integer qstart = 0;
+                        Integer qend = 0;
+                        Integer copy = 0;
+                        Integer seq = 0;
+
+                        int ID = -1;
+                        if(txt_id.equals(""))
+                        {
+                            Toast.makeText(SettingQActivity.this,"กรุณากรอก Division ID",Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        else
+                        {
+                            List<DivInfo> divInfos = LogMgr.Load_DivInfo(SettingQActivity.this);
+                            if(divInfos != null && divInfos.size() > 0)
+                            {
+                                for(DivInfo data : divInfos)
+                                {
+                                    if(data.getID().equals(txt_id))
+                                    {
+                                        Toast.makeText(SettingQActivity.this,"ID นี้มีการใช้งานอยู่ฝนระบบแล้ว",Toast.LENGTH_LONG).show();
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                        if(name.equals(""))
+                        {
+                            Toast.makeText(SettingQActivity.this,"กรุณากรอกชื่อ Division",Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        if(txt_qstart.equals(""))
+                        {
+                            txt_qstart = "0";
+                        }
+                        if(txt_qend.equals(""))
+                        {
+                            txt_qend = "0";
+                        }
+                        if(txt_copy.equals(""))
+                        {
+                            txt_copy = "0";
+                        }
+                        if(alert.equals(""))
+                        {
+                            alert = "0";
+                        }
+                        if(txt_seq.equals(""))
+                        {
+                            txt_seq = "0";
+                        }
+
+                        id = Integer.parseInt(txt_id);
+                        qstart = Integer.parseInt(txt_qstart);
+                        qend = Integer.parseInt(txt_qend);
+                        copy = Integer.parseInt(txt_copy);
+                        seq = Integer.parseInt(txt_seq);
+                        DivInfo info = new DivInfo(GData.Branch_ID,id,name,desc,qstart,qend,copy,alert,seq,0,0);
+                        List<DivInfo> divInfos = LogMgr.Load_DivInfo(SettingQActivity.this);
+                        divInfos.add(info);
+                        if(LogMgr.Save_DivInfo(SettingQActivity.this,divInfos))
+                        {
+                            Toast.makeText(SettingQActivity.this,"บันทึกข้อมูลสำเร็จ",Toast.LENGTH_LONG).show();
+                            RefreshDiv();
+                            dialog.dismiss();
+                        }else
+                        {
+                            Toast.makeText(SettingQActivity.this,"บันทึกข้อมูลไม่สำเร็จ",Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+                dialog.show();
+            }
+        });
         //endregion
 
         //region Setting Stainfo
@@ -919,7 +1041,7 @@ public class SettingQActivity extends AppCompatActivity {
                 dialog.setView(dtDivView);
                 dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
                 dialog.setCancelable(false);
-                final TextView btn_dt_div_close = dtDivView.findViewById(R.id.btn_dt_div_close);
+                final ImageView btn_dt_div_close = dtDivView.findViewById(R.id.btn_dt_div_close);
                 btn_dt_div_close.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) { dialog.dismiss(); }
@@ -935,19 +1057,22 @@ public class SettingQActivity extends AppCompatActivity {
                 final TextView txt_dt_qend = dtDivView.findViewById(R.id.txt_dt_qend);
                 txt_dt_qend.setText(div.getQStop().toString());
                 final TextView txt_dt_copy = dtDivView.findViewById(R.id.txt_dt_copy);
-                txt_dt_copy.setText(div.getPrint_Coppies().toString());
+                txt_dt_copy.setText(div.getPrint_Coppies().toString() + " Copy");
                 final TextView txt_dt_alert = dtDivView.findViewById(R.id.txt_dt_alert);
                 txt_dt_alert.setText(div.getServtime_alert().toString());
                 final TextView txt_dt_seq = dtDivView.findViewById(R.id.txt_dt_seq);
                 txt_dt_seq.setText(div.getSeq().toString());
-
                 dialog.show();
             }});
         layoutManagerDiv = new LinearLayoutManager(this);
         RC_Divinfo.setLayoutManager(layoutManagerDiv);
         RC_Divinfo.setAdapter(adapter);
     }
+    private void RefreshDivMap()
+    {
+        List<DivMapGroupInfo> divMapGroupInfoList = LogMgr.Load_DivMapGroupInfo(SettingQActivity.this);
 
+    }
     private void CallAPI()
     {
         //region ApiEmployeeInfo
@@ -1021,6 +1146,10 @@ public class SettingQActivity extends AppCompatActivity {
                 GData.callAPI_Index++;
             }
         });
+        //endregion
+
+        //region Div Map
+
         //endregion
     }
 
