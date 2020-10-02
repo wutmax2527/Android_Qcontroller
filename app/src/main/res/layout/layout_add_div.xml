@@ -8,34 +8,34 @@
     android:paddingRight="10dp">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="82dp"
-        android:background="@drawable/shap_dialog_head"
-        android:gravity="center_horizontal"
-        android:orientation="horizontal">
+    android:layout_width="match_parent"
+    android:layout_height="82dp"
+    android:background="@drawable/shap_dialog_head"
+    android:gravity="center_horizontal"
+    android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/txt_dt_setting_head"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="30dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:layout_weight="1"
-            android:gravity="center_horizontal|center_vertical"
-            android:text="Division Info"
-            android:textColor="@android:color/background_light"
-            android:textSize="30sp"
-            android:textStyle="bold" />
+    <TextView
+        android:id="@+id/txt_dt_setting_head"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_weight="1"
+        android:gravity="center_horizontal|center_vertical"
+        android:text="Division Info"
+        android:textColor="@android:color/background_light"
+        android:textSize="30sp"
+        android:textStyle="bold" />
 
-        <ImageView
-            android:id="@+id/btn_dt_div_close"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginRight="10dp"
-            android:background="@android:drawable/ic_menu_close_clear_cancel" />
-    </LinearLayout>
+    <ImageView
+        android:id="@+id/btn_dt_div_close"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="10dp"
+        android:background="@android:drawable/ic_menu_close_clear_cancel" />
+</LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

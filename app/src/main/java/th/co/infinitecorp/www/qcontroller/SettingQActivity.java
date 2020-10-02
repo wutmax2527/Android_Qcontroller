@@ -10,14 +10,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
@@ -27,24 +25,19 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Set;
 
-import th.co.infinitecorp.www.qcontroller.ADAPTER.DivinfoAdapter;
-import th.co.infinitecorp.www.qcontroller.ADAPTER.EmpInfoAdapter;
-import th.co.infinitecorp.www.qcontroller.ADAPTER.GroupInfoAdapter;
-import th.co.infinitecorp.www.qcontroller.ADAPTER.StationInfoAdapter;
+import th.co.infinitecorp.www.qcontroller.ADAPTER.AdapterRecycler;
 import th.co.infinitecorp.www.qcontroller.API.QcontrollerApi;
 import th.co.infinitecorp.www.qcontroller.DataInfo.MASTER.BranchInfo;
 import th.co.infinitecorp.www.qcontroller.DataInfo.MASTER.DivInfo;
 import th.co.infinitecorp.www.qcontroller.DataInfo.MASTER.EmployeeInfo;
 import th.co.infinitecorp.www.qcontroller.DataInfo.MASTER.GrpInfo;
+import th.co.infinitecorp.www.qcontroller.DataInfo.MASTER.PF_DIVMAP;
 import th.co.infinitecorp.www.qcontroller.DataInfo.MASTER.StaInfo;
-import th.co.infinitecorp.www.qcontroller.DataInfo.Mapping.DivMapGroupInfo;
 import th.co.infinitecorp.www.qcontroller.EventBus.DebugMessageEvent;
 import th.co.infinitecorp.www.qcontroller.Management.LogMgr;
 import th.co.infinitecorp.www.qcontroller.Management.Setting_System;
@@ -57,13 +50,13 @@ public class SettingQActivity extends AppCompatActivity {
     private LinearLayout lt_Setting_System_Server, lt_Setting_System_Branch,lt_Setting_Group,lt_Setting_Div,lt_Setting_Station,lt_Setting_DivMap;
     private Switch switch_mode;
     private TextView txt_system_server, txt_system_branchid,txt_branch_id,txt_branch_code,txt_branch_name,txt_branch_IP,txt_branch_open,txt_branch_close;
-
+    private TextView textView37xx,textView37x;
 
     private Button btn_setting, btn_QDisplay, btn_Setting_System, btn_Setting_User, btn_Setting_Profile, btn_Setting_Branch, btn_Setting_Resource, btn_save_system,btn_save_branch,btn_branch_open,btn_branch_close;
     private Button btn_bk_setting, btn_bk_setting_system, btn_home_setting_system,btn_bk_user,btn_user_addEmp,btn_home_user,btn_bk_setting_branch,btn_home_branch,btn_bk_profile,btn_home_profile;
     private Button btn_bk_group,btn_home_group,btn_add_group,btn_bk_station,btn_home_station,btn_add_station,btn_add_div;
     private Button btn_group,btn_div,btn_station,btn_divmap;
-    private Button btn_bk_div,btn_home_div,btn_bk_div_map,btn_home_div_map,btn_add_div_map;
+    private Button btn_bk_div,btn_home_div,btn_bk_div_map,btn_home_div_map,btn_add_div_map,btn_div_map_back_to_group;
 
     RecyclerView.LayoutManager layoutManagerEmp,layoutManagerGrp,layoutManagerSta,layoutManagerDiv,layoutManagerDivMap;
     RecyclerView RC_EmpInfo,RC_GroupInfo,RC_Stainfo,RC_Divinfo,RC_DivMap;
@@ -82,6 +75,18 @@ public class SettingQActivity extends AppCompatActivity {
         Station,
         Division_Map
     }
+
+    public enum TAG_RC
+    {
+        DivisionInfo,
+        EmpInfo,
+        StationInfo,
+        GroupInfo,
+        PF_DIVMAP
+    }
+
+    private int GrpID = -1;
+    private String GrpName = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,19 +110,17 @@ public class SettingQActivity extends AppCompatActivity {
             btn_add_div.setVisibility(View.VISIBLE);
             lt_Setting_System_Server.setVisibility(View.GONE);
             lt_Setting_System_Branch.setVisibility(View.GONE);
-            LogMgr.Delete_EmployeeInfo(SettingQActivity.this);
-            LogMgr.Delete_GrpInfo(SettingQActivity.this);
-            LogMgr.Delete_StaInfo(SettingQActivity.this);
-            LogMgr.Delete_DivInfo(SettingQActivity.this);
+//            LogMgr.Delete_EmployeeInfo(SettingQActivity.this);
+//            LogMgr.Delete_GrpInfo(SettingQActivity.this);
+//            LogMgr.Delete_StaInfo(SettingQActivity.this);
+//            LogMgr.Delete_DivInfo(SettingQActivity.this);
+//            LogMgr.Delete_PF_DIVMAPInfo(SettingQActivity.this);
             RefreshDataEmp();
             RefreshGroup();
             RefreshStation();
             RefreshDiv();
+            RefreshDivMap();
         }
-
-        RefreshDataEmp();
-        RefreshDataBranch();
-        RefreshGroup();
         ChangePage(MyPage.Main);
     }
 
@@ -237,7 +240,6 @@ public class SettingQActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 ChangePage(MyPage.Main);
-                String aa = "";
             }
         });
         btn_save_system = (Button) findViewById(R.id.btn_save_system);
@@ -289,10 +291,12 @@ public class SettingQActivity extends AppCompatActivity {
                     LogMgr.Delete_GrpInfo(SettingQActivity.this);
                     LogMgr.Delete_StaInfo(SettingQActivity.this);
                     LogMgr.Delete_DivInfo(SettingQActivity.this);
+                    LogMgr.Delete_PF_DIVMAPInfo(SettingQActivity.this);
                     RefreshDataEmp();
                     RefreshGroup();
                     RefreshStation();
                     RefreshDiv();
+                    RefreshDivMap();
                 }
             }
         });
@@ -415,7 +419,7 @@ public class SettingQActivity extends AppCompatActivity {
                             }else
                             {
                                     Toast.makeText(SettingQActivity.this,"บันทึกข้อมูลพนักงานไม่สำเร็จ",Toast.LENGTH_LONG).show();
-                                }
+                            }
 
                             dialog.dismiss();
                         }
@@ -602,6 +606,7 @@ public class SettingQActivity extends AppCompatActivity {
                     }
                 });
                 final TextView txt_group_id = addGroupView.findViewById(R.id.txt_group_id);
+                txt_group_id.setTransformationMethod(null);
                 final TextView  txt_group_name = addGroupView.findViewById(R.id.txt_group_name);
                 final TextView  txt_group_detail = addGroupView.findViewById(R.id.txt_group_detail);
                 final TextView  btn_save_group = addGroupView.findViewById(R.id.btn_save_group);
@@ -653,6 +658,7 @@ public class SettingQActivity extends AppCompatActivity {
                         {
                             Toast.makeText(SettingQActivity.this,"บันทึกข้อมูลสำเร็จ",Toast.LENGTH_LONG).show();
                             RefreshGroup();
+                            RefreshDivMap();
                             dialog.dismiss();
                         }else
                         {
@@ -834,8 +840,8 @@ public class SettingQActivity extends AppCompatActivity {
                 });
                 final TextView txt_sta_id = addStaView.findViewById(R.id.txt_sta_id);
                 final TextView txt_sta_name = addStaView.findViewById(R.id.txt_sta_name);
-                final  Spinner spinner = addStaView.findViewById(R.id.spin_station_group);
 
+                final  Spinner spinner = addStaView.findViewById(R.id.spin_station_group);
                 List<GrpInfo> grpInfoList = LogMgr.Load_GrpInfo(SettingQActivity.this);
                 List<String> dataListGrp = new ArrayList<>();
                 dataListGrp.add("Please Select");
@@ -844,6 +850,7 @@ public class SettingQActivity extends AppCompatActivity {
                 }
                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(SettingQActivity.this, R.layout.spinner_cell, dataListGrp);
                 spinner.setAdapter(adapter);
+
                 final Button btn_save_sta = addStaView.findViewById(R.id.btn_save_sta);
                 btn_save_sta.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -924,6 +931,23 @@ public class SettingQActivity extends AppCompatActivity {
         //endregion
 
         //region Setting Div Map Group
+        textView37xx = (TextView)findViewById(R.id.textView37xx);
+        final float scale = getResources().getDisplayMetrics().density;
+        textView37xx.setWidth((int) (100 * scale));
+        textView37x = (TextView)findViewById(R.id.textView37x);
+        textView37x.setVisibility(View.GONE);
+        RC_DivMap = (RecyclerView)findViewById(R.id.RC_DivMap);
+        btn_div_map_back_to_group = (Button)findViewById(R.id.btn_div_map_back_to_group);
+        btn_div_map_back_to_group.setVisibility(View.GONE);
+        btn_div_map_back_to_group.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                btn_div_map_back_to_group.setVisibility(View.GONE);
+                textView37x.setVisibility(View.GONE);
+                textView37xx.setWidth((int) (100 * scale));
+                RefreshDivMap();
+            }
+        });
         btn_bk_div_map = (Button)findViewById(R.id.btn_bk_div_map);
         btn_bk_div_map.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -937,16 +961,104 @@ public class SettingQActivity extends AppCompatActivity {
                 ChangePage(MyPage.Main);
             }
         });
+        btn_add_div_map = (Button)findViewById(R.id.btn_add_div_map);
+        btn_add_div_map.setVisibility(View.GONE);
+        btn_add_div_map.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LayoutInflater inflater = LayoutInflater.from(SettingQActivity.this);
+                final View v = inflater.inflate(R.layout.layout_add_divmap,null);
+                final AlertDialog dialog = new AlertDialog.Builder(SettingQActivity.this).create();
+                dialog.setView(v);
+                dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                dialog.setCancelable(false);
+                final ImageView btn_dt_divmap_close = v.findViewById(R.id.btn_dt_divmap_close);
+                btn_dt_divmap_close.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) { dialog.dismiss();
+                    }
+                });
+                final TextView txt_Grp_name = v.findViewById(R.id.txt_Grp_name);
+                txt_Grp_name.setText("Group Name " + GrpName);
+
+                final  Spinner spinner_level = v.findViewById(R.id.spin_divmap_level);
+                List<String> level = new ArrayList<>();
+                level.add("1");
+                level.add("2");
+                ArrayAdapter<String> adapter_level = new ArrayAdapter<String>(SettingQActivity.this, R.layout.spinner_cell, level);
+                spinner_level.setAdapter(adapter_level);
+
+                final Spinner spin_divmap_div = v.findViewById(R.id.spin_divmap_div);
+                List<String> dataDiv = new ArrayList<>();
+                final List<DivInfo> info = LogMgr.Load_DivInfo(SettingQActivity.this);
+                for(DivInfo s : info)
+                {
+                    dataDiv.add(s.getID() + " : "+s.getName());
+                }
+                ArrayAdapter<String> adapter_div = new ArrayAdapter<String>(SettingQActivity.this, R.layout.spinner_cell, dataDiv);
+                spin_divmap_div.setAdapter(adapter_div);
+                final Button btn_save_divmap = v.findViewById(R.id.btn_save_divmap);
+                btn_save_divmap.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        int div = info.get(spin_divmap_div.getSelectedItemPosition()).getID();
+                        int level = spinner_level.getSelectedItemPosition() + 1;
+                        List<PF_DIVMAP> info = LogMgr.Load_PF_DIVMAPInfo(SettingQActivity.this);
+                        for(PF_DIVMAP s : info)
+                        {
+                            if(GrpID == s.getGROUP_ID() && s.getDIVISION_ID() == div)
+                            {
+                                Toast.makeText(SettingQActivity.this,"Division นี้อยู่ในระบบแล้ว" , Toast.LENGTH_LONG).show();
+                                return;
+                            }
+                        }
+                        PF_DIVMAP data = new PF_DIVMAP(GData.Branch_ID,1,GrpID,div,level);
+                        info.add(data);
+                        if(LogMgr.Save_PF_DIVMAPInfo(SettingQActivity.this,info))
+                        {
+                            Toast.makeText(SettingQActivity.this,"บันทึกข้อมูลสำเร็จ",Toast.LENGTH_LONG).show();
+                            AdapterRecycler adapter = new AdapterRecycler(SettingQActivity.this, TAG_RC.PF_DIVMAP, GrpID, new AdapterRecycler.onDivMapInfoListener() {
+                                @Override
+                                public void onSelectedPFDivMap(PF_DIVMAP pfDivmap, int positon) {
+
+                                }
+                            });
+                            layoutManagerDivMap = new LinearLayoutManager(SettingQActivity.this);
+                            RC_DivMap.setLayoutManager(layoutManagerDivMap);
+                            RC_DivMap.setAdapter(adapter);
+                            dialog.dismiss();
+                        }else
+                        {
+                            Toast.makeText(SettingQActivity.this,"บันทึกข้อมูลไม่สำเร็จ",Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+                dialog.show();
+            }
+        });
         //endregion
     }
-
+    //region Refresh
+    private void RefreshDataBranch()
+    {
+        //Branch Info
+        txt_branch_id.setText("Branch ID : " + GData.Branch_ID.toString());
+        List<BranchInfo> branchInfoList = LogMgr.Load_BranchInfo(SettingQActivity.this);
+        if(branchInfoList != null && branchInfoList.size() > 0)
+        {
+            BranchInfo branchInfo = branchInfoList.get(0);
+            txt_branch_code.setText(branchInfo.getCode().trim());
+            txt_branch_name.setText(branchInfo.getName());
+            txt_branch_IP.setText(branchInfo.getIPAddress());
+            txt_branch_open.setText(branchInfo.getOpen());
+            txt_branch_close.setText(branchInfo.getClose());
+        }
+    }
     private void RefreshDataEmp()
     {
-        //EmployeeInfo
-        List<EmployeeInfo> employeeInfos = LogMgr.Load_EmployeeInfo(SettingQActivity.this);
-        EmpInfoAdapter adapter = new EmpInfoAdapter(SettingQActivity.this, employeeInfos, new EmpInfoAdapter.onEmpInfoListener() {
+        AdapterRecycler adapter = new AdapterRecycler(SettingQActivity.this, TAG_RC.EmpInfo, new AdapterRecycler.onEmpInfoListener() {
             @Override
-            public void onSelectedItem(EmployeeInfo employeeInfo, int position) {
+            public void onSelectedEmpItem(final EmployeeInfo employeeInfo, int position) {
                 LayoutInflater inflater = LayoutInflater.from(SettingQActivity.this);
                 final View DtEmpView = inflater.inflate(R.layout.layout_detail_employee,null);
                 final AlertDialog dialog = new AlertDialog.Builder(SettingQActivity.this).create();
@@ -980,6 +1092,34 @@ public class SettingQActivity extends AppCompatActivity {
                 txt_dt_title.setText(employeeInfo.getTitle());
                 final TextView txt_dt_address = (TextView)DtEmpView.findViewById(R.id.txt_dt_address);
                 txt_dt_address.setText(employeeInfo.getAddress1());
+                final Button btn_delete_emp = (Button)DtEmpView.findViewById(R.id.btn_delete_emp);
+                if(GData.ONLINE_MODE)
+                {
+                    btn_delete_emp.setVisibility(View.GONE);
+                }
+                btn_delete_emp.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        List<EmployeeInfo> emp = LogMgr.Load_EmployeeInfo(SettingQActivity.this);
+                        List<EmployeeInfo> info = new ArrayList<>();
+                        for(EmployeeInfo s : emp)
+                        {
+                            if(!s.getId().equals(employeeInfo.getId()))
+                            {
+                                info.add(s);
+                            }
+                        }
+                        if(LogMgr.Save_EmployeeInfo(SettingQActivity.this,info))
+                        {
+                            Toast.makeText(SettingQActivity.this,"ลบข้อมูลพนักงานสำเร็จ",Toast.LENGTH_LONG).show();
+                            RefreshDataEmp();
+                            dialog.dismiss();
+                        }else
+                        {
+                            Toast.makeText(SettingQActivity.this,"ลบข้อมูลพนักงานไม่สำเร็จ",Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
                 dialog.show();
             }
         });
@@ -987,41 +1127,120 @@ public class SettingQActivity extends AppCompatActivity {
         RC_EmpInfo.setLayoutManager(layoutManagerEmp);
         RC_EmpInfo.setAdapter(adapter);
     }
-    private void RefreshDataBranch()
-    {
-        //Branch Info
-        txt_branch_id.setText("Branch ID : " + GData.Branch_ID.toString());
-        List<BranchInfo> branchInfoList = LogMgr.Load_BranchInfo(SettingQActivity.this);
-        if(branchInfoList != null && branchInfoList.size() > 0)
-        {
-            BranchInfo branchInfo = branchInfoList.get(0);
-            txt_branch_code.setText(branchInfo.getCode().trim());
-            txt_branch_name.setText(branchInfo.getName());
-            txt_branch_IP.setText(branchInfo.getIPAddress());
-            txt_branch_open.setText(branchInfo.getOpen());
-            txt_branch_close.setText(branchInfo.getClose());
-        }
-    }
     private void RefreshGroup()
     {
-        List<GrpInfo> grpInfoList = LogMgr.Load_GrpInfo(SettingQActivity.this);
-        GroupInfoAdapter adapter = new GroupInfoAdapter(SettingQActivity.this, grpInfoList, new GroupInfoAdapter.onGrpInfoListener() {
-            @Override
-            public void onSelectedItem(GrpInfo grpInfo, int position) {
-
-            }
-        });
+        AdapterRecycler adapter = new AdapterRecycler(SettingQActivity.this, TAG_RC.GroupInfo, new AdapterRecycler.onGrpInfoListener() {
+            @Override public void onSelectedItem(final GrpInfo grpInfo, int position) {
+                LayoutInflater inflater = LayoutInflater.from(SettingQActivity.this);
+                final View v = inflater.inflate(R.layout.layout_detail_grp,null);
+                final AlertDialog dialog = new AlertDialog.Builder(SettingQActivity.this).create();
+                dialog.setView(v);
+                dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                dialog.setCancelable(false);
+                final ImageView btn_dt_grp_close = v.findViewById(R.id.btn_dt_grp_close);
+                btn_dt_grp_close.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) { dialog.dismiss();
+                    }
+                });
+                final TextView txt_dt_id = v.findViewById(R.id.txt_dt_id);
+                txt_dt_id.setText(grpInfo.getID().toString());
+                final TextView txt_dt_name = v.findViewById(R.id.txt_dt_name);
+                txt_dt_name.setText(grpInfo.getName());
+                final TextView txt_dt_des = v.findViewById(R.id.txt_dt_des);
+                txt_dt_des.setText(grpInfo.getDesc());
+                final Button btn_dt_grp_delete = v.findViewById(R.id.btn_dt_grp_delete);
+                if(GData.ONLINE_MODE){
+                    btn_dt_grp_delete.setVisibility(View.GONE);
+                }
+                btn_dt_grp_delete.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        List<GrpInfo> infoList = LogMgr.Load_GrpInfo(SettingQActivity.this);
+                        List<GrpInfo> info = new ArrayList<>();
+                        for(GrpInfo s : infoList)
+                        {
+                            if(!s.getID().equals(grpInfo.getID()))
+                            {
+                                info.add(s);
+                            }
+                        }
+                        if(LogMgr.Save_GrpInfo(SettingQActivity.this,info))
+                        {
+                            Toast.makeText(SettingQActivity.this,"ลบข้อมูลสำเร็จ",Toast.LENGTH_LONG).show();
+                            RefreshGroup();
+                            dialog.dismiss();
+                        }else
+                        {
+                            Toast.makeText(SettingQActivity.this,"ลบข้อมูลไม่สำเร็จ",Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+                dialog.show();
+            }});
         layoutManagerGrp = new LinearLayoutManager(this);
         RC_GroupInfo.setLayoutManager(layoutManagerGrp);
         RC_GroupInfo.setAdapter(adapter);
     }
     private void RefreshStation()
     {
-        List<StaInfo> staInfos = LogMgr.Load_StaInfo(SettingQActivity.this);
-        StationInfoAdapter adapter = new StationInfoAdapter(SettingQActivity.this, staInfos, new StationInfoAdapter.onStaInfoListener() {
+        AdapterRecycler adapter = new AdapterRecycler(SettingQActivity.this, TAG_RC.StationInfo, new AdapterRecycler.onStaInfoListener() {
             @Override
-            public void onSelectedItem(StaInfo staInfo, int position) {
-
+            public void onSelectedItem(final StaInfo Info, int position) {
+                LayoutInflater inflater = LayoutInflater.from(SettingQActivity.this);
+                final View v = inflater.inflate(R.layout.layout_detail_sta,null);
+                final AlertDialog dialog = new AlertDialog.Builder(SettingQActivity.this).create();
+                dialog.setView(v);
+                dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                dialog.setCancelable(false);
+                final ImageView btn_dt_sta_close = v.findViewById(R.id.btn_dt_sta_close);
+                btn_dt_sta_close.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) { dialog.dismiss();
+                    }
+                });
+                final TextView txt_dt_id = v.findViewById(R.id.txt_dt_id);
+                txt_dt_id.setText(Info.getID().toString());
+                final TextView txt_dt_name = v.findViewById(R.id.txt_dt_name);
+                txt_dt_name.setText(Info.getName());
+                final TextView txt_dt_grp = v.findViewById(R.id.txt_dt_grp);
+                final List<GrpInfo> grpList = LogMgr.Load_GrpInfo(SettingQActivity.this);
+                for(GrpInfo s : grpList)
+                {
+                    if(s.getID().toString().equals(Info.getID().toString()))
+                    {
+                        txt_dt_grp.setText(s.getName());
+                        break;
+                    }
+                }
+                final Button btn_dt_sta_delete = v.findViewById(R.id.btn_dt_sta_delete);
+                if(GData.ONLINE_MODE){
+                    btn_dt_sta_delete.setVisibility(View.GONE);
+                }
+                btn_dt_sta_delete.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        List<StaInfo> data = new ArrayList<>();
+                        List<StaInfo> staInfoList = LogMgr.Load_StaInfo(SettingQActivity.this);
+                        for (StaInfo s : staInfoList)
+                        {
+                            if(!s.getID().equals(Info.getID()))
+                            {
+                                data.add(s);
+                            }
+                        }
+                        if(LogMgr.Save_StaInfo(SettingQActivity.this,data))
+                        {
+                            Toast.makeText(SettingQActivity.this,"ลบข้อมูลสำเร็จ",Toast.LENGTH_LONG).show();
+                            RefreshStation();
+                            dialog.dismiss();
+                        }else
+                        {
+                            Toast.makeText(SettingQActivity.this,"ลบข้อมูลไม่สำเร็จ",Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+                dialog.show();
             }
         });
         layoutManagerSta = new LinearLayoutManager(this);
@@ -1030,11 +1249,9 @@ public class SettingQActivity extends AppCompatActivity {
     }
     private void RefreshDiv()
     {
-        List<DivInfo> divInfos = LogMgr.Load_DivInfo(SettingQActivity.this);
-        DivinfoAdapter adapter = new DivinfoAdapter(SettingQActivity.this, divInfos, new DivinfoAdapter.onDivInfoListener() {
+        AdapterRecycler adapter = new AdapterRecycler(SettingQActivity.this, TAG_RC.DivisionInfo, new AdapterRecycler.onDivInfoListener() {
             @Override
-            public void onSelectedItem(DivInfo div, int position)
-            {
+            public void onSelectedItem(final DivInfo div, int position) {
                 LayoutInflater inflater = LayoutInflater.from(SettingQActivity.this);
                 final View dtDivView = inflater.inflate(R.layout.layout_detail_div,null);
                 final AlertDialog dialog = new AlertDialog.Builder(SettingQActivity.this).create();
@@ -1062,19 +1279,133 @@ public class SettingQActivity extends AppCompatActivity {
                 txt_dt_alert.setText(div.getServtime_alert().toString());
                 final TextView txt_dt_seq = dtDivView.findViewById(R.id.txt_dt_seq);
                 txt_dt_seq.setText(div.getSeq().toString());
+                final Button btn_dt_div_delete = dtDivView.findViewById(R.id.btn_dt_div_delete);
+                if(GData.ONLINE_MODE){
+                    btn_dt_div_delete.setVisibility(View.GONE);
+                }
+                btn_dt_div_delete.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        List<DivInfo> infoList = LogMgr.Load_DivInfo(SettingQActivity.this);
+                        List<DivInfo> info = new ArrayList<>();
+                        for(DivInfo s : infoList)
+                        {
+                            if(!s.getID().equals(div.getID()))
+                            {
+                                info.add(s);
+                            }
+                        }
+                        if(LogMgr.Save_DivInfo(SettingQActivity.this,info))
+                        {
+                            Toast.makeText(SettingQActivity.this,"ลบข้อมูลสำเร็จ",Toast.LENGTH_LONG).show();
+                            RefreshDiv();
+                            dialog.dismiss();
+                        }else
+                        {
+                            Toast.makeText(SettingQActivity.this,"ลบข้อมูลไม่สำเร็จ",Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
                 dialog.show();
-            }});
+            }
+        });
         layoutManagerDiv = new LinearLayoutManager(this);
         RC_Divinfo.setLayoutManager(layoutManagerDiv);
         RC_Divinfo.setAdapter(adapter);
     }
     private void RefreshDivMap()
     {
-        List<DivMapGroupInfo> divMapGroupInfoList = LogMgr.Load_DivMapGroupInfo(SettingQActivity.this);
+        AdapterRecycler adapter = new AdapterRecycler(SettingQActivity.this, TAG_RC.GroupInfo, new AdapterRecycler.onGrpInfoListener() {
+            @Override public void onSelectedItem(GrpInfo grpInfo, int position)
+            {
+                GrpID = grpInfo.getID();
+                GrpName = grpInfo.getName();
+                btn_div_map_back_to_group.setVisibility(View.VISIBLE);
+                textView37x.setVisibility(View.VISIBLE);
+                final float scale = getResources().getDisplayMetrics().density;
+                textView37x.setWidth((int) (80 * scale));
+                textView37xx.setWidth((int) (80 * scale));
+                if(GData.ONLINE_MODE)
+                {
+                    btn_add_div_map.setVisibility(View.GONE);
+                }else
+                    {
+                        btn_add_div_map.setVisibility(View.VISIBLE);
+                    }
+                AdapterRecycler adapter = new AdapterRecycler(SettingQActivity.this, TAG_RC.PF_DIVMAP, grpInfo.getID(), new AdapterRecycler.onDivMapInfoListener() {
+                    @Override
+                    public void onSelectedPFDivMap(final PF_DIVMAP pfDivmap, int positon) {
+                        LayoutInflater inflater = LayoutInflater.from(SettingQActivity.this);
+                        final View v = inflater.inflate(R.layout.layout_detail_div,null);
+                        final AlertDialog dialog = new AlertDialog.Builder(SettingQActivity.this).create();
+                        dialog.setView(v);
+                        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                        dialog.setCancelable(false);
+                        final ImageView btn_dt_dm_close = v.findViewById(R.id.btn_dt_dm_close);
+                        btn_dt_dm_close.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) { dialog.dismiss();
+                            }
+                        });
+                        final TextView txt_dt_div = v.findViewById(R.id.txt_dt_div);
+                        List<DivInfo> divList = LogMgr.Load_DivInfo(SettingQActivity.this);
+                        for(DivInfo s : divList)
+                        {
+                            if(s.getID().equals(pfDivmap.getDIVISION_ID()))
+                            {
+                                txt_dt_div.setText(s.getName());
+                                break;
+                            }
+                        }
+                        final TextView txt_dt_grp = v.findViewById(R.id.txt_dt_grp);
+                        List<GrpInfo> grpList = LogMgr.Load_GrpInfo(SettingQActivity.this);
+                        for(GrpInfo s : grpList)
+                        {
+                            if(s.getID().equals(pfDivmap.getGROUP_ID()))
+                            {
+                                txt_dt_grp.setText(s.getName());
+                                break;
+                            }
+                        }
 
+                        final Button btn_dt_dm_delete = v.findViewById(R.id.btn_dt_dm_delete);
+                        btn_dt_dm_delete.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                List<PF_DIVMAP> info = LogMgr.Load_PF_DIVMAPInfo(SettingQActivity.this);
+                                List<PF_DIVMAP> data = new ArrayList<>();
+                                for(PF_DIVMAP s : info)
+                                {
+                                    if(!s.getGROUP_ID().equals(pfDivmap.getGROUP_ID()) && !s.getDIVISION_ID().equals(pfDivmap.getDIVISION_ID()))
+                                    {
+                                        data.add(s);
+                                    }
+                                }
+                                if(LogMgr.Save_PF_DIVMAPInfo(SettingQActivity.this,data))
+                                {
+                                    Toast.makeText(SettingQActivity.this,"ลบข้อมูลสำเร็จ",Toast.LENGTH_LONG).show();
+                                    RefreshDivMap();
+                                    dialog.dismiss();
+                                }else
+                                {
+                                    Toast.makeText(SettingQActivity.this,"ลบข้อมูลไม่สำเร็จ",Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        });
+                        dialog.show();
+                    }
+                });
+                layoutManagerDivMap = new LinearLayoutManager(SettingQActivity.this);
+                RC_DivMap.setLayoutManager(layoutManagerDivMap);
+                RC_DivMap.setAdapter(adapter);
+            }});
+        layoutManagerDivMap = new LinearLayoutManager(SettingQActivity.this);
+        RC_DivMap.setLayoutManager(layoutManagerDivMap);
+        RC_DivMap.setAdapter(adapter);
     }
-    private void CallAPI()
-    {
+    //endregion
+
+    private void CallAPI() {
         //region ApiEmployeeInfo
         String searchEmp = "{'branch_id' : '" + GData.Branch_ID + "'}";
         new QcontrollerApi().RequestEmployeeInfoDetail(searchEmp, new QcontrollerApi.EmployeeInfoDetailListener() {
@@ -1149,7 +1480,17 @@ public class SettingQActivity extends AppCompatActivity {
         //endregion
 
         //region Div Map
-
+        new QcontrollerApi().RequestPF_DIVMAPInfoDetail("{branch_id:" + GData.Branch_ID.toString() + ",PROFILE_ID:1}", new QcontrollerApi.PF_DivMapInfoDetailListener() {
+            @Override
+            public void onPF_DivMapInfoResult(List<PF_DIVMAP> info, Integer http_code) {
+                EventBus.getDefault().post(new DebugMessageEvent("PF_DIVMAP http_code="+http_code));
+                if(info!=null) {
+                    LogMgr.Save_PF_DIVMAPInfo(SettingQActivity.this,info);
+                    RefreshDivMap();
+                }
+                GData.callAPI_Index++;
+            }
+        });
         //endregion
     }
 
@@ -1202,7 +1543,6 @@ public class SettingQActivity extends AppCompatActivity {
             }
             case User: {
                 lt_Setting_User.setVisibility(View.VISIBLE);
-                //EmployeeInfo();
                 break;
             }
             case Profile: {
@@ -1219,15 +1559,19 @@ public class SettingQActivity extends AppCompatActivity {
             }
             case Group: {
                 lt_Setting_Group.setVisibility(View.VISIBLE);
+                break;
             }
             case Division: {
                 lt_Setting_Div.setVisibility(View.VISIBLE);
+                break;
             }
             case Division_Map: {
                 lt_Setting_DivMap.setVisibility(View.VISIBLE);
+                break;
             }
             case Station: {
                 lt_Setting_Station.setVisibility(View.VISIBLE);
+                break;
             }
         }
     }

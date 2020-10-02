@@ -263,6 +263,22 @@
                     android:textColor="@color/Black"
                     android:textSize="15sp" />
             </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp">
+
+
+                <Button
+                    android:id="@+id/btn_dt_div_delete"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Delete" />
+            </LinearLayout>
         </LinearLayout>
 
     </LinearLayout>

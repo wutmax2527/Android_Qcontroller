@@ -12,6 +12,14 @@ public class PF_DIVMAP {
 
      }
 
+     public PF_DIVMAP(Integer BRANCH_ID, Integer PROFILE_ID, Integer GROUP_ID, Integer DIVISION_ID, Integer LEVEL_SERVICE) {
+          this.BRANCH_ID = BRANCH_ID;
+          this.PROFILE_ID = PROFILE_ID;
+          this.GROUP_ID = GROUP_ID;
+          this.DIVISION_ID = DIVISION_ID;
+          this.LEVEL_SERVICE = LEVEL_SERVICE;
+     }
+
      public Integer getBRANCH_ID() {
           return BRANCH_ID;
      }
