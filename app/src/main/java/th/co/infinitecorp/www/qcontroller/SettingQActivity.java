@@ -1336,7 +1336,7 @@ public class SettingQActivity extends AppCompatActivity {
                     @Override
                     public void onSelectedPFDivMap(final PF_DIVMAP pfDivmap, int positon) {
                         LayoutInflater inflater = LayoutInflater.from(SettingQActivity.this);
-                        final View v = inflater.inflate(R.layout.layout_detail_div,null);
+                        final View v = inflater.inflate(R.layout.layout_detail_divmap,null);
                         final AlertDialog dialog = new AlertDialog.Builder(SettingQActivity.this).create();
                         dialog.setView(v);
                         dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
@@ -1369,6 +1369,10 @@ public class SettingQActivity extends AppCompatActivity {
                         }
 
                         final Button btn_dt_dm_delete = v.findViewById(R.id.btn_dt_dm_delete);
+                        if(GData.ONLINE_MODE)
+                        {
+                            btn_dt_dm_delete.setVisibility(View.GONE);
+                        }
                         btn_dt_dm_delete.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
