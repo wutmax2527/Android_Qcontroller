@@ -148,14 +148,42 @@
             android:id="@+id/lt_QDisplay"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_margin="10dp"
             android:orientation="vertical"
             tools:visibility="gone">
 
-            <TextView
-                android:id="@+id/textView2"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="QDisplay" />
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_bk_display"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Back" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/textView2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Q Display" />
+                </LinearLayout>
+
+            </LinearLayout>
         </LinearLayout>
 
         <LinearLayout
@@ -1340,16 +1368,6 @@
                                     android:textSize="20sp" />
 
                                 <TextView
-                                    android:id="@+id/textView37x"
-                                    android:layout_width="80dp"
-                                    android:layout_height="wrap_content"
-                                    android:text="ID"
-                                    android:textAlignment="center"
-                                    android:textColor="@color/Black"
-                                    android:textSize="20sp"
-                                    tools:visibility="gone" />
-
-                                <TextView
                                     android:id="@+id/textView36z"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
@@ -1358,6 +1376,16 @@
                                     android:textAlignment="center"
                                     android:textColor="@color/Black"
                                     android:textSize="20sp" />
+
+                                <TextView
+                                    android:id="@+id/textView37x"
+                                    android:layout_width="80dp"
+                                    android:layout_height="wrap_content"
+                                    android:text="ID"
+                                    android:textAlignment="center"
+                                    android:textColor="@color/Black"
+                                    android:textSize="20sp"
+                                    tools:visibility="gone" />
 
 
                             </LinearLayout>

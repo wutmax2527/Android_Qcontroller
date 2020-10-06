@@ -61,6 +61,8 @@ public class SettingQActivity extends AppCompatActivity {
     RecyclerView.LayoutManager layoutManagerEmp,layoutManagerGrp,layoutManagerSta,layoutManagerDiv,layoutManagerDivMap;
     RecyclerView RC_EmpInfo,RC_GroupInfo,RC_Stainfo,RC_Divinfo,RC_DivMap;
 
+    private Button btn_bk_display;
+
     private static enum MyPage {
         Main,
         Setting,
@@ -1037,7 +1039,18 @@ public class SettingQActivity extends AppCompatActivity {
             }
         });
         //endregion
+
+        //region Q Display
+        btn_bk_display = (Button)findViewById(R.id.btn_bk_display);
+        btn_bk_display.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ChangePage(MyPage.Main);
+            }
+        });
+        //endregion
     }
+
     //region Refresh
     private void RefreshDataBranch()
     {
@@ -1347,6 +1360,8 @@ public class SettingQActivity extends AppCompatActivity {
                             public void onClick(View view) { dialog.dismiss();
                             }
                         });
+                        final TextView txt_dt_divID = v.findViewById(R.id.txt_dt_divID);
+                        txt_dt_divID.setText(pfDivmap.getDIVISION_ID().toString());
                         final TextView txt_dt_div = v.findViewById(R.id.txt_dt_div);
                         List<DivInfo> divList = LogMgr.Load_DivInfo(SettingQActivity.this);
                         for(DivInfo s : divList)
