@@ -9,6 +9,7 @@ import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -939,6 +940,7 @@ public class SettingQActivity extends AppCompatActivity {
         textView37x = (TextView)findViewById(R.id.textView37x);
         textView37x.setVisibility(View.GONE);
         RC_DivMap = (RecyclerView)findViewById(R.id.RC_DivMap);
+
         btn_div_map_back_to_group = (Button)findViewById(R.id.btn_div_map_back_to_group);
         btn_div_map_back_to_group.setVisibility(View.GONE);
         btn_div_map_back_to_group.setOnClickListener(new View.OnClickListener() {
@@ -1421,6 +1423,7 @@ public class SettingQActivity extends AppCompatActivity {
         layoutManagerDivMap = new LinearLayoutManager(SettingQActivity.this);
         RC_DivMap.setLayoutManager(layoutManagerDivMap);
         RC_DivMap.setAdapter(adapter);
+
     }
     //endregion
 
